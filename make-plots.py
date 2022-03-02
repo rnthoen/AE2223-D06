@@ -2,11 +2,11 @@
 Organize data into dataframes
 """
 
-files = ['~/Desktop/TAS/A2223-I D6/L103/L1-03.csv',
-         '~/Desktop/TAS/A2223-I D6/L104/L1-04.csv',
-         '~/Desktop/TAS/A2223-I D6/L105/L1-05.csv',
-         '~/Desktop/TAS/A2223-I D6/L109/L1-09.csv',
-         '~/Desktop/TAS/A2223-I D6/L123/L1-23.csv',
+files = ['Data/L103/L1-03.csv',
+         'Data/L104/L1-04.csv',
+         'Data/L105/L1-05.csv',
+         'Data/L109/L1-09.csv',
+         'Data/L123/L1-23.csv',
 ]
 
 import pandas as pd
