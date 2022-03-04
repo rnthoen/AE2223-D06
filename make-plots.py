@@ -14,7 +14,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Read CSV data
-select_file = files[4]
+select_file = files[0]
 df = pd.read_csv(select_file)
 
 # Select data to plot
@@ -92,18 +92,18 @@ plt.style.use("fivethirtyeight")
 fig, ax1 = plt.subplots(figsize = (16,9))
 fig.set_tight_layout(True)
 
-# plt.scatter(time[start:end], load[start:end])
-# plt.scatter(new_sequence_time, new_sequence_load)
-# plt.xlabel("Time [s]")
-# plt.ylabel("Applied load [kN]")
-# plt.title(f"Test Sequences Separated ({select_file[-25:]})")
+plt.scatter(time[start:end], load[start:end])
+plt.scatter(new_sequence_time, new_sequence_load)
+plt.xlabel("Time [s]")
+plt.ylabel("Applied load [kN]")
+plt.title(f"Test Sequences Separated ({select_file[-25:]})")
 
-ax1.scatter(length[0], length[1], color = "blue", alpha = 0.8)
-ax1.set_xlabel("Cycles [-]")
-ax1.set_ylabel("Data points [-]", color = "blue")
-ax2 = ax1.twinx()
-ax2.scatter(duration[0][:-1], duration[1][:-1], color = "red", alpha = 0.8)
-ax2.set_ylabel("Duration [s]", color = "red")
-plt.title(f"Data Points and Duration of Test Sequence ({select_file[-25:]})")
-print(len(time))
+# ax1.scatter(length[0], length[1], color = "blue", alpha = 0.8)
+# ax1.set_xlabel("Cycles [-]")
+# ax1.set_ylabel("Data points [-]", color = "blue")
+# ax2 = ax1.twinx()
+# ax2.scatter(duration[0][:-1], duration[1][:-1], color = "red", alpha = 0.8)
+# ax2.set_ylabel("Duration [s]", color = "red")
+# plt.title(f"Data Points and Duration of Test Sequence ({select_file[-25:]})")
+# print(len(time))
 plt.show()
