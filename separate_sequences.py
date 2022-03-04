@@ -68,7 +68,4 @@ def separate_sequences(dataframe):
     # Create dataframe
     sequences_dataframe = pd.DataFrame({'cycle_number': cycle_number_list, 'start_count': start_count_list, 'end_count': end_count_list})
 
-    # Save dataframe as csv
-    sequences_dataframe.to_csv('separated_sequences.csv')
-
     return sequences_dataframe
