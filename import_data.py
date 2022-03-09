@@ -37,15 +37,16 @@ def import_data(file_names):
 
     # read DIC CSV data into pandas dataframes
     DIC_dfs = []
+    count = 0
     for file_name_DIC in file_names[1:]:
         df_DIC = pd.read_csv(file_name_DIC, header=None, sep=";", skiprows=lambda x: x in [0, 1])
-        # df_DIC.rename(columns={" File_Number": "File_Number", " AOI_Number": "AOI_Number", " X": "X", " Y": "Y", " Z": "Z", " U": "U", " V": "V",
-        #                       " W": "W", " Exx": "Exx", " Eyy": "Eyy", " Exy": "Exy", " E1": "E1", " E2": "E2"}, inplace=True)
-        print(df_DIC)
-        # df_DIC.drop("AOI_Number", axis=1, inplace=True)
+        df_DIC.columns = ["File_Number", "AOI_Number", "X", "Y", "Z", "U", "V", "W", "Exx", "Eyy", "Exy", "E1", "E2"]
+        df_DIC["File_Number"] = df_DIC["File_Number"] + count
+        df_DIC.drop("AOI_Number", axis=1, inplace=True)
+        count = df_DIC["File_Number"].iloc[-1] + 1
         DIC_dfs.append(df_DIC)
-
-    return df_processed_MTS
+    df_processed_DIC = pd.concat(DIC_dfs)
+    return df_processed_MTS, df_processed_DIC
 
 
 
