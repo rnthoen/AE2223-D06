@@ -67,17 +67,17 @@ def separate_sequences(dataframe):
                 if (condition1 and condition2):
                     # Print error message
                     location = dataframe['count'][i]
-                    print(f'Type E1 error occured at count = {location}: {test_results}')
+                    #print(f'Type E1 error occured at count = {location}: {test_results}')
 
                 else:
                     # Print error message
                     location = dataframe['count'][i]
-                    print(f'Error occured at count = {location}: {test_results} ({condition1}, {condition2}, {temp_displacement_jump})')
+                    #print(f'Error occured at count = {location}: {test_results} ({condition1}, {condition2}, {temp_displacement_jump})')
 
             else:
                 # Print error message
                 location = dataframe['count'][i]
-                print(f'Error occured at count = {location}: {test_results}')
+                #print(f'Error occured at count = {location}: {test_results}')
 
         i += 1
 
