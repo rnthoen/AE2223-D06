@@ -1,5 +1,7 @@
 import pandas as pd
 
+# input should look like "df_data[0]"
+
 def separate_sequences(dataframe):
     length = len(dataframe['count'])
 
