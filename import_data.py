@@ -16,9 +16,9 @@ def import_data(file_names):
     # trim start and end of files
     trim_points = {
         "Data/L103/L1-03.csv": [44, -3],
-        "Data/L104/L1-04.csv": [37, -5],
+        "Data/L104/L1-04.csv": [38, -5],
         "Data/L105/L1-05.csv": [38, -5],
-        "Data/L109/L1-09.csv": [35, -4],
+        "Data/L109/L1-09.csv": [36, -4],
         "Data/L123/L1-23.csv": [814, -4878]
     }
     start = trim_points[MTS_file_name][0]                   # start of  useful data
