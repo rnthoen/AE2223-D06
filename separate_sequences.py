@@ -16,6 +16,8 @@ def separate_sequences(dataframe):
     time_jump = 5 # [s]
     load_jump = 0 # [kN]
     displacement_jump = 0 # [mm]
+    small_displacement_jump = 0.05 # [mm]
+    large_displacement_jump = 0.8 # [mm]
 
     i = 0
     while (i < (length - 1)):
@@ -54,10 +56,28 @@ def separate_sequences(dataframe):
             start_count = end_count + 1
             start_count_list.append(start_count)
 
-        if (sum(test_results) == 2) or (sum(test_results) == 1):
-            # Print error message
-            location = dataframe['count'][i]
-            print(f'Error occured at count = {location}: {test_results}')
+        elif (sum(test_results) == 2) or (sum(test_results) == 1):
+            # Check for type 1 error (FFT, second-last datapoint)
+            if test_results == [False, False, True]:
+                condition1 = abs(dataframe['displacement'][i+1] - dataframe['displacement'][i]) < small_displacement_jump
+                condition2 = (dataframe['displacement'][i+2] - dataframe['displacement'][i]) > large_displacement_jump
+
+                temp_displacement_jump = (dataframe['displacement'][i+2] - dataframe['displacement'][i])
+
+                if (condition1 and condition2):
+                    # Print error message
+                    location = dataframe['count'][i]
+                    print(f'Type E1 error occured at count = {location}: {test_results}')
+
+                else:
+                    # Print error message
+                    location = dataframe['count'][i]
+                    print(f'Error occured at count = {location}: {test_results} ({condition1}, {condition2}, {temp_displacement_jump})')
+
+            else:
+                # Print error message
+                location = dataframe['count'][i]
+                print(f'Error occured at count = {location}: {test_results}')
 
         i += 1
 
