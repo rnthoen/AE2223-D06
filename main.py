@@ -24,7 +24,10 @@ cycle_number_list = [500, 30500, 60500, 90500, 120500]
 plot_data = axial_curve_data(cycle_number_list, df_separated, df_data[0])
 
 for j in range(len(cycle_number_list)):
-    plt.plot(plot_data[j][2], plot_data[j][1], label = f'{cycle_number_list[j]} cycles')
+    ax = plt.subplot()
+    ax.plot(plot_data[j][2], plot_data[j][1], label = f'{cycle_number_list[j]} cycles')
+    ax.invert_xaxis()
+    ax.invert_yaxis()
 
 plt.xlabel('Displacement [mm]')
 plt.ylabel('Load [kN]')
