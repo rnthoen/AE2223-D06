@@ -12,5 +12,5 @@ select_specimen = files[0]
 
 df_data = import_data(select_specimen)
 
-# df_separated = separate_sequences(df_data)
-# df_separated.to_csv(f'separated_sequences_{select_specimen[0][5:9]}.csv')
+df_separated = separate_sequences(df_data)
+df_separated.to_csv(f'separated_sequences_{select_specimen[0][5:9]}.csv')

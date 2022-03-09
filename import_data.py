@@ -6,7 +6,7 @@ def import_data(file_names):
     """
     :param file_names: file_names[0] contains MTS data, remainder of file_names containts DTC files
     :return:    - df_processed_MTS is the MTS data with columns = ['count', 'time', 'load', 'displacement']
-                - df_processed_DIC is the DIC data with columns = ['', 'x', 'y', 'z', 'u', 'v', 'w', 'Exx', 'Eyy', 'Exy', 'E1', 'E2']
+                - df_processed_DIC is the DIC data with columns = ['File_Number', 'x', 'y', 'z', 'u', 'v', 'w', 'Exx', 'Eyy', 'Exy', 'E1', 'E2']
     """
 
     # Read MTS CSV data into pandas dataframe
@@ -38,6 +38,8 @@ def import_data(file_names):
     # read DIC CSV data into pandas dataframes
     DIC_dfs = []
     count = 0
+    start = df_processed_MTS["count"].iloc[0]
+    end = df_processed_MTS["count"].iloc[-1]
     for file_name_DIC in file_names[1:]:
         df_DIC = pd.read_csv(file_name_DIC, header=None, sep=";", skiprows=lambda x: x in [0, 1])
         df_DIC.columns = ["File_Number", "AOI_Number", "X", "Y", "Z", "U", "V", "W", "Exx", "Eyy", "Exy", "E1", "E2"]
@@ -45,7 +47,12 @@ def import_data(file_names):
         df_DIC.drop("AOI_Number", axis=1, inplace=True)
         count = df_DIC["File_Number"].iloc[-1] + 1
         DIC_dfs.append(df_DIC)
+
     df_processed_DIC = pd.concat(DIC_dfs)
+    df_processed_DIC["File_Number"] = df_processed_DIC["File_Number"] * 2                  # match indices with MTS data
+    df_processed_DIC = df_processed_DIC[df_processed_DIC.File_Number >= start]             # trim data
+    df_processed_DIC = df_processed_DIC[df_processed_DIC.File_Number <= end]
+
     return df_processed_MTS, df_processed_DIC
 
 
