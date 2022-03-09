@@ -10,7 +10,8 @@ def import_data(file_names):
     """
 
     # Read MTS CSV data into pandas dataframe
-    df_MTS = pd.read_csv(file_names[0])
+    MTS_file_name = file_names[0]
+    df_MTS = pd.read_csv(MTS_file_name)
 
     # trim start and end of files
     trim_points = {
@@ -20,8 +21,8 @@ def import_data(file_names):
         "Data/L109/L1-09.csv": [35, -4],
         "Data/L123/L1-23.csv": [814, -4878]
     }
-    start = trim_points[file_names][0]                   # start of  useful data
-    end = trim_points[file_names][1]                     # end of useful data
+    start = trim_points[MTS_file_name][0]                   # start of  useful data
+    end = trim_points[MTS_file_name][1]                     # end of useful data
     df_MTS = df_MTS[start:end]                                  # trimmed data
 
     # Create new dataframe
@@ -35,8 +36,14 @@ def import_data(file_names):
     df_processed_MTS = pd.DataFrame(data=data_numpy, columns=data_columns)
 
     # read DIC CSV data into pandas dataframes
-
-
+    DIC_dfs = []
+    for file_name_DIC in file_names[1:]:
+        df_DIC = pd.read_csv(file_name_DIC, header=None, sep=";", skiprows=lambda x: x in [0, 1])
+        # df_DIC.rename(columns={" File_Number": "File_Number", " AOI_Number": "AOI_Number", " X": "X", " Y": "Y", " Z": "Z", " U": "U", " V": "V",
+        #                       " W": "W", " Exx": "Exx", " Eyy": "Eyy", " Exy": "Exy", " E1": "E1", " E2": "E2"}, inplace=True)
+        print(df_DIC)
+        # df_DIC.drop("AOI_Number", axis=1, inplace=True)
+        DIC_dfs.append(df_DIC)
 
     return df_processed_MTS
 
