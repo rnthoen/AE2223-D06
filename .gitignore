@@ -149,3 +149,4 @@ cython_debug/
 
 # Raw images for animation
 Figures/
+Heatmap/

@@ -21,35 +21,25 @@ df_data = import_data(select_specimen)
 df_separated = separate_sequences(df_data[0])
 df_separated.to_csv(f'separated_sequences_{select_specimen[0][5:9]}.csv')
 
-#Make min/max displacement plot_data
-#min_max_displacement(df_separated, df_data[0])
-
-# Make axial curve plot
-# cycle_number_list = [500, 30500, 60500, 90500, 120500]
-# plot_data = axial_curve_data(cycle_number_list, df_separated, df_data[0])
-#
-# for j in range(len(cycle_number_list)):
-#     ax = plt.subplot()
-#     ax.plot(plot_data[j][2], plot_data[j][1], label = f'{cycle_number_list[j]} cycles')
-#     ax.invert_xaxis()
-#     ax.invert_yaxis()
-#
-# plt.xlabel('Displacement [mm]')
-# plt.ylabel('Load [kN]')
-# plt.title(f'Load-displacement of {select_specimen[0][5:9]}')
-# plt.legend()
-# plt.show()
-
-# Make heatmap plot
-cycle_number = 500
-count_offset = 6
-variable = 'Exy'
-plot_data = heatmap_data(cycle_number, count_offset, df_separated, df_data[1], variable)
+# Make heatmap plots
+cycle_number = 60500
+idx = df_separated.cycle_number[df_separated.cycle_number == cycle_number].index.tolist()
+start_count = int(df_separated.start_count[idx])
+end_count = int(df_separated.end_count[idx])
+max_offset = end_count - start_count
 
 point_size = 40
 colormap = 'coolwarm'
 color_label = 'Exy [-]'
-count = plot_data[4]
-plot_title = f'{select_specimen[0][5:9]}, {cycle_number} cycles, count = {count}'
-filename = f'Heatmap/{select_specimen[0][5:9]}_{cycle_number}_{count}.jpg'
-heatmap_plot(plot_data, point_size, colormap, color_label, plot_title, filename)
+
+count_offset = 0
+while count_offset <= max_offset:
+    variable = 'Exy'
+    plot_data = heatmap_data(cycle_number, count_offset, df_separated, df_data[1], variable)
+
+    count = plot_data[4]
+    plot_title = f'{select_specimen[0][5:9]}, {cycle_number} cycles, count = {count}'
+    filename = f'Heatmap/{select_specimen[0][5:9]}/{cycle_number}/{count}.jpg'
+    heatmap_plot(plot_data, point_size, colormap, color_label, plot_title, filename)
+
+    count_offset += 2
