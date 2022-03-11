@@ -12,7 +12,7 @@ files = [['Data/L103/L1-03.csv', 'Data/L103/L1-03_0_2_4052.csv', 'Data/L103/L1-0
          ['Data/L109/L1-09.csv', 'Data/L109/L1-09_0_2_4016.csv', 'Data/L109/L1-09_4018_2_8288.csv', 'Data/L109/L1-09_8290_2_12072.csv', 'Data/L109/L1-09_12074_2_14760.csv'],
          ['Data/L123/L1-23.csv', 'Data/L123/L1-23_0_2_4000.csv', 'Data/L123/L1-23_4002_2_8080.csv', 'Data/L123/L1-23_8082_2_12430.csv', 'Data/L123/L1-23_12432_2_15850.csv', 'Data/L123/L1-23_15852_2_20506.csv', 'Data/L123/L1-23_20508_2_24236.csv', 'Data/L123/L1-23_24238_2_28894.csv', 'Data/L123/L1-23_28896_2_31384.csv', 'Data/L123/L1-23_31386_2_35416.csv', 'Data/L123/L1-23_35418_2_40390.csv', 'Data/L123/L1-23_40392_2_42256.csv']]
 
-select_specimen = files[0]
+select_specimen = files[4]
 
 df_data = import_data(select_specimen)
 
@@ -20,25 +20,28 @@ df_separated = separate_sequences(df_data[0])
 df_separated.to_csv(f'separated_sequences_{select_specimen[0][5:9]}.csv')
 
 # Make axial curve plot
-cycle_number_list = [500, 30500, 60500, 90500, 120500]
-plot_data = axial_curve_data(cycle_number_list, df_separated, df_data[0])
+cycle_number_list_all = df_separated.cycle_number
+#cycle_number_list_all = [500, 1000, 1500, 2000]
 
-<<<<<<< HEAD
-min_max_displacement(df_separated, df_data[0])
-# plt.scatter(plot_data[0][2], plot_data[0][1])
-# plt.xlabel('Displacement [mm]')
-# plt.ylabel('Load [kN]')
-# plt.show()
-=======
-for j in range(len(cycle_number_list)):
-    ax = plt.subplot()
-    ax.plot(plot_data[j][2], plot_data[j][1], label = f'{cycle_number_list[j]} cycles')
-    ax.invert_xaxis()
-    ax.invert_yaxis()
+fig = plt.figure(figsize=(19.20,10.80))
+plt.style.use('fivethirtyeight')
+fig.set_tight_layout(True)
+for i in range(len(cycle_number_list_all)):
+    cycle_number_list = [cycle_number_list_all[i]]
 
-plt.xlabel('Displacement [mm]')
-plt.ylabel('Load [kN]')
-plt.title(f'Load-displacement of {select_specimen[0][5:9]}')
-plt.legend()
-plt.show()
->>>>>>> fa05fc7c82eb1ea1badb96d2fba20b2c5d79cb87
+    plot_data = axial_curve_data(cycle_number_list, df_separated, df_data[0])
+
+    for j in range(len(cycle_number_list)):
+        ax = plt.subplot()
+        ax.clear()
+        ax.set_xlim([0,-1.5])
+        ax.set_ylim([0,-70])
+        ax.plot(plot_data[j][2], plot_data[j][1], label = f'{cycle_number_list[j]} cycles')
+        #ax.invert_xaxis()
+        #ax.invert_yaxis()
+
+    plt.xlabel('Displacement [mm]')
+    plt.ylabel('Load [kN]')
+    plt.title(f'Load-displacement of {select_specimen[0][5:9]}')
+    plt.legend(loc='upper left', fontsize=18)
+    plt.savefig(f'Figures/{select_specimen[0][5:9]}/{"{:03d}".format(i)}.jpg')

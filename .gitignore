@@ -146,3 +146,6 @@ cython_debug/
 
 # CSV files
 *.csv
+
+# Raw images for animation
+Figures/
