@@ -23,6 +23,7 @@ df_separated.to_csv(f'separated_sequences_{select_specimen[0][5:9]}.csv')
 cycle_number_list = [500]
 plot_data = axial_curve_data(cycle_number_list, df_separated, df_data[0])
 
+min_max_displacement(df_separated, df_data[0])
 # plt.scatter(plot_data[0][2], plot_data[0][1])
 # plt.xlabel('Displacement [mm]')
 # plt.ylabel('Load [kN]')
