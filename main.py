@@ -23,13 +23,15 @@ df_separated.to_csv(f'separated_sequences_{select_specimen[0][5:9]}.csv')
 
 
 # poisson data
-cycle_number = 50500
-offset = 0
-start_count = df_separated["start_count"].loc[df_separated["cycle_number"] == cycle_number]
-count = start_count.iloc[0] + offset
-if count % 2 != 0:
-    count += 1
-poisson(df_data, count, select_specimen[0][5:9], cycle_number)
+cycle_number = 500
+start_count = df_separated["start_count"].loc[df_separated["cycle_number"] == cycle_number].iloc[0]
+end_count = df_separated["end_count"].loc[df_separated["cycle_number"] == cycle_number].iloc[0]
+if start_count % 2 != 0:
+    start_count += 1
+elif end_count % 2 != 0:
+    end_count -=1
+
+poisson(df_data, start_count, select_specimen[0][5:9], cycle_number)
 
 
 #Make min/max displacement plot_data
