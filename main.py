@@ -5,6 +5,7 @@ from import_data import import_data
 from separate_sequences import separate_sequences
 from axial_curve_data import axial_curve_data
 from min_max_displacement import min_max_displacement
+from poisson import poisson
 from heatmap_data import heatmap_data
 from heatmap_plot import heatmap_plot
 
@@ -17,9 +18,21 @@ files = [['Data/L103/L1-03.csv', 'Data/L103/L1-03_0_2_4052.csv', 'Data/L103/L1-0
 select_specimen = files[0]
 
 df_data = import_data(select_specimen)
-
 df_separated = separate_sequences(df_data[0])
 df_separated.to_csv(f'separated_sequences_{select_specimen[0][5:9]}.csv')
+
+
+# poisson data
+cycle_number = 500
+start_count = df_separated["start_count"].loc[df_separated["cycle_number"] == cycle_number].iloc[0]
+end_count = df_separated["end_count"].loc[df_separated["cycle_number"] == cycle_number].iloc[0]
+if start_count % 2 != 0:
+    start_count += 1
+elif end_count % 2 != 0:
+    end_count -=1
+
+poisson(df_data, start_count, select_specimen[0][5:9], cycle_number)
+
 
 #Make min/max displacement plot_data
 #min_max_displacement(df_separated, df_data[0])
@@ -52,4 +65,4 @@ color_label = 'Exy [-]'
 count = plot_data[4]
 plot_title = f'{select_specimen[0][5:9]}, {cycle_number} cycles, count = {count}'
 filename = f'Heatmap/{select_specimen[0][5:9]}_{cycle_number}_{count}.jpg'
-heatmap_plot(plot_data, point_size, colormap, color_label, plot_title, filename)
+heatmap_plot(plot_data, point_size, colormap, color_label, plot_title, filename, (-0.005, 0.005))
