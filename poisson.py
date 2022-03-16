@@ -1,5 +1,6 @@
 from interpolate_panel import interpolate_panel
 import numpy as np
+import heatmap_data
 import matplotlib.pyplot as plt
 
 
@@ -14,7 +15,7 @@ def poisson(df_data, x, N):
     poisson_ratio = -strain_x/strain_y
     print("Load: ", MTS_df.loc[MTS_df['count'] == N]["load"].iloc[0])
     print(poisson_ratio.shape)
-    plt.scatter(np.linspace(-65, 65, 200), np.linspace(-70, 70, 200), s=200, c=poisson_ratio, cmap='gray')
-    plt.show()
+
+    print(len(poisson_ratio))
 
 
