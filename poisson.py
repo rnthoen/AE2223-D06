@@ -20,7 +20,7 @@ def poisson(df_data, N, specimen, cycle_number):
     point_size = 20
     range = (min(poisson_ratio.flatten()), max(poisson_ratio.flatten()))
     # range = (-1, 1)
-    colormap = 'bwr'
+    colormap = 'rainbow'
     color_label = 'poisson [-]'
     plot_title = f'{specimen}, {load} kN, count = {N}, cycle number = {cycle_number}'
     filename = f'Heatmap/{specimen}_{N}.jpg'
