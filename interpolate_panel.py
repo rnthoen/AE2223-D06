@@ -12,5 +12,5 @@ def interpolate_panel(DIC_df, N, grid_x, grid_y, variable):
     df_seq = DIC_df.loc[DIC_df['File_Number'] == N]
     points = np.vstack([df_seq["X"], df_seq["Y"]]).transpose()
     values = np.array(df_seq[variable])
-    grid_values = interpol.griddata(points, values, (grid_x, grid_y), method='nearest', rescale=False)
+    grid_values = interpol.griddata(points, values, (grid_x, grid_y), method='linear', rescale=False)
     return grid_values
