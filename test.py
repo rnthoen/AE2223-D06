@@ -26,14 +26,8 @@ def strain_load_curve_data(df_seperated, df_data):
 
             x[j][p] = -df_data[1]["Eyy"].iloc[idx1[0]+90*j+10]
             p=p+1
-        #strain1.append(-df_data[1]["Eyy"].iloc[idx1[0]+100])
-        #strain2.append(-df_data[1]["Eyy"].iloc[idx1[0]+500])
-        #strain3.append(-df_data[1]["Eyy"].iloc[idx1[0]+900])
-    for z in range(10):
+
         plt.plot(force, x[z])
-    #plt.plot(force, strain1)
-    #plt.plot(force, strain2)
-    #plt.plot(force, strain3)
-    
+
     plt.show()
     return

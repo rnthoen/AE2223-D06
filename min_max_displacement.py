@@ -28,32 +28,33 @@ def min_max_displacement(df_seperated, df_data):
         #r = np.sum((x-xb)*(y-yb))/(np.sum((x-xb)**2*(y-yb)**2))**0.5
 
         r = np.corrcoef(x, y)
-        print(r[0][1])
+        #print(r[0][1])
         r_lst.append(r[0][1])
 
 
     fig, (ax1, ax2, ax3) = plt.subplots(3)
     #fig.suptitle('Vertically stacked subplots')
-    fig.suptitle('A tale of 2 subplots this is the smaller one')
+    #fig.suptitle('Minimum, maximum deformation, correlation between force and displacement vs number of cycles ')
     #ax1.plot(x, y)
     #ax2.plot(x, -y)
 
-    #plt.subplot(2, 1, 1)
-    ax1.plot(cycle_number_list, min_deformation_list, 'ko-', linewidth=0)
+    plt.subplot(3, 1, 1)
+    plt.plot(cycle_number_list, min_deformation_list, 'ko-', linewidth=0,ms=2)
 
-    #ax1.ylabel('min deformation, mm')
+    plt.ylabel('min deformation, mm')
 
 
-    #ax2.subplot(2, 1, 2)
-    ax2.plot(cycle_number_list, max_deformation_list, 'r.-', linewidth=0)
+    plt.subplot(3, 1, 2)
+    plt.plot(cycle_number_list, max_deformation_list, 'r.-', linewidth=0, ms=2)
     #plt.xlabel('number of cycles')
-    #ax2.ylabel('max deformation, mm')
+    plt.ylabel('max deformation, mm')
 
-    #ax3.subplot(2, 1, 3)
-    ax3.plot(cycle_number_list, r_lst, 'r.-', linewidth=0)
-    #ax3.xlabel('number of cycles')
-    #ax3.ylabel('r')
+    plt.subplot(3, 1, 3)
+    plt.plot(cycle_number_list, r_lst, 'b.-', linewidth=0, ms = 2)
 
+    plt.xlabel('number of cycles')
+    plt.ylabel('correlation')
+    plt.savefig("minMaxCorrL123.svg")
     plt.show()
     #plt.plot()
     #plt.plot()
