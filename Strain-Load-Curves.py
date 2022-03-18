@@ -1,5 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
 
 from separate_sequences import separate_sequences
 from import_data import import_data
@@ -44,7 +45,7 @@ def strain_load_curve_data(cycle_number_list, df_separated, df_data, X_position,
             while i <= end_count:
                 if i%2 == 0:
                     Strain_position = interpolate_panel(df_data[1],i,xs,Y_position[idx0],strain_type)
-                    strain_position_list.append(Strain_position[-1])
+                    strain_position_list.append(Strain_position)
 
                     idx = df_data[0]['count'][df_data[0]['count'] == i].index.tolist()
                     load = float(df_data[0].load[idx])
@@ -65,53 +66,24 @@ def strain_load_curve_data(cycle_number_list, df_separated, df_data, X_position,
 
     return result
 
-cycle_number_list = [100500]
-x_middles = [-32,0,32]
-y_middles = [37,0,-37]
-x = []
-y = []
-for x_middle in x_middles:
-    x.append([x_middle-1,x_middle,x_middle+1])
-for y_middle in y_middles:
-    y.append([y_middle-1,y_middle,y_middle+1])
-print(x,y)
+cycle_number_list = [500,50500,100500,150500]
+x_middles = list(np.linspace(-80, 80, 10))
+
+y_middles = list(np.linspace(-110, 110, 10))
+
 strain = "Eyy"
 
-plot_data = strain_load_curve_data(cycle_number_list, df_separated, df_data, x, y, strain)
-#print(plot_data[0][1],plot_data[0][2])
+plot_data = strain_load_curve_data(cycle_number_list, df_separated, df_data, x_middles, y_middles, strain)
 
-fig, axs = plt.subplots(2,constrained_layout=True)
-for j in range(len(cycle_number_list)):
-    axs[0].plot(plot_data[j][1], plot_data[j][-1], label=f'{cycle_number_list[j]} cycles')
-    axs[0].invert_xaxis()
-    axs[0].invert_yaxis()
-    axs[0].set_title(f'Strain at x = {x}, y = {y} vs. Load')
-    axs[0].legend(bbox_to_anchor=(1.04, 1), loc="upper left")
-
-    # axs[0].plot(plot_data[j][1], plot_data[j][2], label = f'{cycle_number_list[j]} cycles')
-    # axs[0].invert_xaxis()
-    # axs[0].invert_yaxis()
-    # axs[0].set_title('Minimum strain - Load')
-    # axs[0].legend(bbox_to_anchor=(1.04,1), loc="upper left")
-    #
-    # axs[1].plot(plot_data[j][1], plot_data[j][3], label=f'{cycle_number_list[j]} cycles')
-    # axs[1].invert_xaxis()
-    # axs[1].invert_yaxis()
-    # axs[1].set_title('Median strain - Load')
-    # axs[1].legend(bbox_to_anchor=(1.04,1), loc="upper left")
-    #
-    # axs[2].plot(plot_data[j][1], plot_data[j][4], label=f'{cycle_number_list[j]} cycles')
-    # axs[2].invert_xaxis()
-    # axs[2].invert_yaxis()
-    # axs[2].set_title('Maximum strain - Load')
-    # axs[2].legend(bbox_to_anchor=(1.04,1), loc="upper left")
-
-    # for n in range(3):
-    #     axs[1].plot(plot_data[j][1], plot_data[j][n+2], label=f'{cycle_number_list[j]} cycles')
-    #     axs[1].invert_xaxis()
-    #     axs[1].invert_yaxis()
-    #     axs[1].set_title('Max, Median and Min. strain - Load')
-    #     axs[1].legend(bbox_to_anchor=(1.04, 1), loc="upper left")
+fig, axs = plt.subplots(len(cycle_number_list),constrained_layout=True)
+for count, cycle in enumerate(cycle_number_list):
+    for n in range(len(x_middles)):
+        axs[count].plot(plot_data[n+count*len(x_middles)][1], plot_data[n+count*len(x_middles)][-1], label=f'{cycle} cycles at location (x={x_middles[n]},y={y_middles[n]})')
+        axs[count].set_title(f'Strain at x = {x_middles}, y = {y_middles} vs. Load')
+        axs[count].legend(bbox_to_anchor=(1.04, 1), loc="upper left", prop={'size': 4})
+        axs[count].axvline(-15,color='k', linestyle="--")
+    axs[count].invert_xaxis()
+    axs[count].invert_yaxis()
 
 for ax in axs.flat:
     ax.set(xlabel='Load [kN]', ylabel='Strain [Eyy]')
