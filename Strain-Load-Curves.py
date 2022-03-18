@@ -67,11 +67,11 @@ def strain_load_curve_data(cycle_number_list, df_separated, df_data, X_position,
     return result
 
 cycle_number_list = [500,50500,100500,150500]
-x_middles = list(np.linspace(-80, 80, 6))
+x_middles = list(np.linspace(-80, 80, 10))
 
-y_middles = list(np.linspace(-110, 110, 6))
+y_middles = list(np.linspace(-110, 110, 10))
 
-strain = "Exx"
+strain = "Eyy"
 
 plot_data = strain_load_curve_data(cycle_number_list, df_separated, df_data, x_middles, y_middles, strain)
 
@@ -80,7 +80,7 @@ for count, cycle in enumerate(cycle_number_list):
     for n in range(len(x_middles)):
         axs[count].plot(plot_data[n+count*len(x_middles)][1], plot_data[n+count*len(x_middles)][-1], label=f'{cycle} cycles at location (x={x_middles[n]},y={y_middles[n]})')
         axs[count].set_title(f'Strain at x = {x_middles}, y = {y_middles} vs. Load')
-        axs[count].legend(bbox_to_anchor=(1.04, 1), loc="upper left")
+        axs[count].legend(bbox_to_anchor=(1.04, 1), loc="upper left", prop={'size': 4})
         axs[count].axvline(-15,color='k', linestyle="--")
     axs[count].invert_xaxis()
     axs[count].invert_yaxis()
