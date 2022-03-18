@@ -36,8 +36,11 @@ for cycle_number in cycle_numbers:
 
     poisson(df_data, start_count, select_specimen[0][5:9], cycle_number, path)
 
+#Make  stiffness coeficient plots
+#buckle = np.ones(len(df_seperated[0]))*(-20)
+#k1,k2 = stiffness(buckle,df_seperated, df_data[0])
 
-#Make min/max displacement plot_data
+#Make min/max displacement, correlation plots
 #min_max_displacement(df_separated, df_data[0])
 
 # Make axial curve plot
