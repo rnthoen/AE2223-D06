@@ -21,14 +21,14 @@ files = [['Data/L103/L1-03.csv', 'Data/L103/L1-03_0_2_4052.csv', 'Data/L103/L1-0
 select_specimen = files[0]
 
 ## Select which cycle numbers you want to see ##
-cycle_number_list = [100500,120500,140500,150500]
+cycle_number_list = [50500,100500,130500,150500]
 
 ## Select position range of points to analyse strain for ##
 x_middles = list(np.linspace(-80, 80, 10))
-y_middles = list(np.linspace(0, 0, 10))
+y_middles = list(np.linspace(-110, 110, 10))
 
 ## Select which type of strain you want to analyse ##
-column = "W"
+column = "Z"
 
 ### Imports MTS data and DIC data and sequences ###
 df_data = import_data(select_specimen)
