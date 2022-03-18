@@ -9,6 +9,7 @@ from min_max_displacement import min_max_displacement
 from poisson import poisson
 from heatmap_data import heatmap_data
 from heatmap_plot import heatmap_plot
+from stiffness_coefficient import stiffness
 
 files = [['Data/L103/L1-03.csv', 'Data/L103/L1-03_0_2_4052.csv', 'Data/L103/L1-03_4054_2_8840.csv', 'Data/L103/L1-03_8842_2_13994.csv', 'Data/L103/L1-03_13996_2_16696.csv'],
          ['Data/L104/L1-04.csv', 'Data/L104/L1-04_0_2_4160.csv', 'Data/L104/L1-04_4162_2_8548.csv', 'Data/L104/L1-04_8550_2_12242.csv', 'Data/L104/L1-04_12244_2_16402.csv', 'Data/L104/L1-04_16404_2_20098.csv', 'Data/L104/L1-04_20100_2_23800.csv', 'Data/L104/L1-04_23802_2_27262.csv', 'Data/L104/L1-04_27264_2_30036.csv', 'Data/L104/L1-04_30038_2_31422.csv'],
@@ -22,8 +23,12 @@ df_data = import_data(select_specimen)
 df_separated = separate_sequences(df_data[0])
 df_separated.to_csv(f'separated_sequences_{select_specimen[0][5:9]}.csv')
 
-
+#Make  stiffness coeficient plots
+#buckle = np.ones(len(df_separated[0]))*(-20)
+buckle = np.linspace(-25, -15, len(df_separated))
+k1,k2 = stiffness(buckle,df_separated, df_data[0])
 # poisson data
+
 path = "left panel/pre-buckling"
 cycle_numbers = np.arange(500, 152000, 500)
 for cycle_number in cycle_numbers:
@@ -36,9 +41,7 @@ for cycle_number in cycle_numbers:
 
     poisson(df_data, start_count, select_specimen[0][5:9], cycle_number, path)
 
-#Make  stiffness coeficient plots
-#buckle = np.ones(len(df_seperated[0]))*(-20)
-#k1,k2 = stiffness(buckle,df_seperated, df_data[0])
+
 
 #Make min/max displacement, correlation plots
 #min_max_displacement(df_separated, df_data[0])
