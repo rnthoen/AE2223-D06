@@ -25,10 +25,10 @@ cycle_number_list = [50500,100500,130500,150500]
 
 ## Select position range of points to analyse strain for ##
 x_middles = list(np.linspace(-80, 80, 10))
-y_middles = list(np.linspace(-110, 110, 10))
+y_middles = list(np.linspace(0, 0, 10))
 
 ## Select which type of strain you want to analyse ##
-column = "Z"
+column = "W"
 
 ### Imports MTS data and DIC data and sequences ###
 df_data = import_data(select_specimen)
@@ -70,6 +70,21 @@ def strain_load_curve_data(cycle_number_list, df_separated, df_data, X_position,
 ### Array with data. Shape = (number of cycles x number of positions) ###
 plot_data = strain_load_curve_data(cycle_number_list, df_separated, df_data, x_middles, y_middles, column)
 
+#print(plot_data[0][-1].iloc[0])
+w_difference = []
+for count,cycle_number in enumerate(cycle_number_list):
+    for n in range(len(x_middles)):
+        j = 1
+        w_difference_list = []
+        while j < len(plot_data[count][-1]):
+            w_difference_list.append(plot_data[n+count*len(x_middles)][-1][j]-plot_data[n+count*len(x_middles)][-1][j-1])
+            j += 1
+        w_difference_list = list(map(abs,w_difference_list))
+        w_difference.append([cycle_number, w_difference_list])
+
+new_load_list = plot_data[0][1].copy()
+new_load_list.pop(0)
+
 ### Several variables for labelling the right stuff ###
 unit = ""
 if column == "X" or column == "Y" or column == "Z" or column == "U" or column == "V" or column == "W":
@@ -82,9 +97,10 @@ elif column == "Exx" or column == "Eyy" or column == "Exy" or column == "E1"  or
 fig, axs = plt.subplots(len(cycle_number_list),constrained_layout=True)
 for count, cycle in enumerate(cycle_number_list):
     for n in range(len(x_middles)):
-        axs[count].plot(plot_data[n+count*len(x_middles)][1], plot_data[n+count*len(x_middles)][-1], label=f'{cycle} cycles at location (x={np.round(x_middles[n],2)},y={np.round(y_middles[n],2)})')
+        #axs[count].plot(plot_data[n+count*len(x_middles)][1], plot_data[n+count*len(x_middles)][-1], label=f'{cycle} cycles at location (x={np.round(x_middles[n],2)},y={np.round(y_middles[n],2)})')
+        axs[count].plot(new_load_list, w_difference[n+count*len(x_middles)][1], label=f'{cycle} cycles at location (x={np.round(x_middles[n],2)},y={np.round(y_middles[n],2)})')
         #axs[count].set_title(f'{column} at x = {np.round(x_middles,2)}, y = {np.round(y_middles,2)} vs. Load')
-        axs[count].legend(bbox_to_anchor=(1.04, 1), loc="upper left", prop={'size': 6})
+        axs[count].legend(bbox_to_anchor=(1.04, 1), loc="upper left", prop={'size': 5})
     axs[count].invert_xaxis()
     axs[count].invert_yaxis()
 
