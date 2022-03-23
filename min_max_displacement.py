@@ -32,7 +32,7 @@ def min_max_displacement(df_seperated, df_data):
         r_lst.append(r[0][1])
 
 
-    fig, (ax1, ax2, ax3) = plt.subplots(3)
+    #fig, (ax1, ax2, ax3) = plt.subplots(3)
     #fig.suptitle('Vertically stacked subplots')
     #fig.suptitle('Minimum, maximum deformation, correlation between force and displacement vs number of cycles ')
     #ax1.plot(x, y)
