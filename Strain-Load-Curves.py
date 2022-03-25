@@ -21,10 +21,10 @@ files = [['Data/L103/L1-03.csv', 'Data/L103/L1-03_0_2_4052.csv', 'Data/L103/L1-0
 select_specimen = files[0]
 
 ## Select which cycle numbers you want to see ##
-cycle_number_list = [50500,100500,130500,150500]
+cycle_number_list = [500,50500,100500,150500]
 
 ## Select position range of points to analyse strain for ##
-x_middles = list(np.linspace(-80, 80, 10))
+x_middles = list(np.linspace(-70, 70, 10))
 y_middles = list(np.linspace(0, 0, 10))
 
 ## Select which type of strain you want to analyse ##
@@ -40,8 +40,8 @@ def strain_load_curve_data(cycle_number_list, df_separated, df_data, X_position,
 
     result = []
     for cycle_number in cycle_number_list:
-        for xs in X_position:
-            idx0 = X_position.index(xs)
+        for xs,X_middle in enumerate(X_position):
+            #idx0 = X_position.index(xs)
             # find start and end in df_separated for cycle_number
             idx = df_separated.cycle_number[df_separated.cycle_number == cycle_number].index.tolist()
             start_count = int(df_separated.start_count[idx])
@@ -54,7 +54,7 @@ def strain_load_curve_data(cycle_number_list, df_separated, df_data, X_position,
             i = start_count
             while i <= end_count:
                 if i%2 == 0:
-                    Column_position = interpolate_panel(df_data[1],i,xs,Y_position[idx0],column_type)
+                    Column_position = interpolate_panel(df_data[1],i,X_middle,Y_position[xs],column_type)
                     column_position_list.append(Column_position)
 
                     idx = df_data[0]['count'][df_data[0]['count'] == i].index.tolist()
@@ -76,14 +76,12 @@ for count,cycle_number in enumerate(cycle_number_list):
     for n in range(len(x_middles)):
         j = 1
         w_difference_list = []
-        while j < len(plot_data[count][-1]):
+        while j < len(plot_data[n+count*len(x_middles)][-1]):
             w_difference_list.append(plot_data[n+count*len(x_middles)][-1][j]-plot_data[n+count*len(x_middles)][-1][j-1])
             j += 1
-        w_difference_list = list(map(abs,w_difference_list))
+        #w_difference_list = list(map(abs,w_difference_list))
         w_difference.append([cycle_number, w_difference_list])
 
-new_load_list = plot_data[0][1].copy()
-new_load_list.pop(0)
 
 ### Several variables for labelling the right stuff ###
 unit = ""
@@ -93,19 +91,41 @@ elif column == "Exx" or column == "Eyy" or column == "Exy" or column == "E1"  or
     unit = "[-]"
 
 ### Plot all locations for all cycle numbers ###
+if len(cycle_number_list) == 1:
+    fig, axs = plt.subplots(1, constrained_layout=True)
+    for count, cycle in enumerate(cycle_number_list):
+        for n in range(len(x_middles)):
+            # axs.plot(plot_data[n+count*len(x_middles)][1], plot_data[n+count*len(x_middles)][-1], label=f'{cycle} cycles at location (x={np.round(x_middles[n],2)},y={np.round(y_middles[n],2)})')
+            new_load_list = plot_data[n+count*len(x_middles)][1].copy()
+            new_load_list.pop(0)
+            axs.plot(new_load_list, w_difference[n+count*len(x_middles)][1], label=f'{cycle} cycles at location (x={np.round(x_middles[n], 2)},y={np.round(y_middles[n], 2)})')
 
-fig, axs = plt.subplots(len(cycle_number_list),constrained_layout=True)
-for count, cycle in enumerate(cycle_number_list):
-    for n in range(len(x_middles)):
-        #axs[count].plot(plot_data[n+count*len(x_middles)][1], plot_data[n+count*len(x_middles)][-1], label=f'{cycle} cycles at location (x={np.round(x_middles[n],2)},y={np.round(y_middles[n],2)})')
-        axs[count].plot(new_load_list, w_difference[n+count*len(x_middles)][1], label=f'{cycle} cycles at location (x={np.round(x_middles[n],2)},y={np.round(y_middles[n],2)})')
-        #axs[count].set_title(f'{column} at x = {np.round(x_middles,2)}, y = {np.round(y_middles,2)} vs. Load')
-        axs[count].legend(bbox_to_anchor=(1.04, 1), loc="upper left", prop={'size': 5})
-    axs[count].invert_xaxis()
-    axs[count].invert_yaxis()
+            # axs[count].set_title(f'{column} at x = {np.round(x_middles,2)}, y = {np.round(y_middles,2)} vs. Load')
+            axs.legend(bbox_to_anchor=(1.04, 1), loc="upper left", prop={'size': 5})
+        axs.invert_xaxis()
+        axs.invert_yaxis()
 
-for ax in axs.flat:
-    ax.set(xlabel='Load [kN]', ylabel=f'{column} {unit}')
+    axs.set(xlabel='Load [kN]', ylabel=f'{column} {unit}')
+    fig.suptitle(f'{column}-Load Analysis of {select_specimen[0][5:9]}')
+    plt.show()
+else:
+    fig, axs = plt.subplots(len(cycle_number_list),constrained_layout=True)
+    for count, cycle in enumerate(cycle_number_list):
+        for n in range(len(x_middles)):
+            #axs[count].plot(plot_data[n+count*len(x_middles)][1], plot_data[n+count*len(x_middles)][-1], label=f'{cycle} cycles at location (x={np.round(x_middles[n],2)},y={np.round(y_middles[n],2)})')
+            new_load_list = plot_data[n+count*len(x_middles)][1].copy()
+            new_load_list.pop(0)
+            axs[count].plot(new_load_list, w_difference[n+count*len(x_middles)][1], label=f'{cycle} cycles at location (x={np.round(x_middles[n],2)},y={np.round(y_middles[n],2)})')
 
-fig.suptitle(f'{column}-Load Analysis of {select_specimen[0][5:9]}')
-plt.show()
+            #axs[count].set_title(f'{column} at x = {np.round(x_middles,2)}, y = {np.round(y_middles,2)} vs. Load')
+            axs[count].hlines(0.1, min(plot_data[n + count * len(x_middles)][1]),
+                              max(plot_data[n + count * len(x_middles)][1]))
+            axs[count].legend(bbox_to_anchor=(1.04, 1), loc="upper left", prop={'size': 5})
+        axs[count].invert_xaxis()
+        axs[count].invert_yaxis()
+
+    for ax in axs.flat:
+        ax.set(xlabel='Load [kN]', ylabel=f'{column} {unit}')
+
+    fig.suptitle(f'{column}-Load Analysis of {select_specimen[0][5:9]}')
+    plt.show()
