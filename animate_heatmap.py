@@ -19,14 +19,18 @@ files = [['Data/L103/L1-03.csv', 'Data/L103/L1-03_0_2_4052.csv', 'Data/L103/L1-0
          ['Data/L109/L1-09.csv', 'Data/L109/L1-09_0_2_4016.csv', 'Data/L109/L1-09_4018_2_8288.csv', 'Data/L109/L1-09_8290_2_12072.csv', 'Data/L109/L1-09_12074_2_14760.csv'],
          ['Data/L123/L1-23.csv', 'Data/L123/L1-23_0_2_4000.csv', 'Data/L123/L1-23_4002_2_8080.csv', 'Data/L123/L1-23_8082_2_12430.csv', 'Data/L123/L1-23_12432_2_15850.csv', 'Data/L123/L1-23_15852_2_20506.csv', 'Data/L123/L1-23_20508_2_24236.csv', 'Data/L123/L1-23_24238_2_28894.csv', 'Data/L123/L1-23_28896_2_31384.csv', 'Data/L123/L1-23_31386_2_35416.csv', 'Data/L123/L1-23_35418_2_40390.csv', 'Data/L123/L1-23_40392_2_42256.csv']]
 
-select_specimen = files[0]
+select_specimen = files[4]
 
 df_data = import_data(select_specimen)
 df_separated = separate_sequences(df_data[0])
 df_separated.to_csv(f'separated_sequences_{select_specimen[0][5:9]}.csv')
 
-N = 14700
-while N <= 14762:
+cycles = 500
+
+
+
+N = 41502
+while N <= 41558:
 
     print(N)
 
@@ -39,18 +43,18 @@ while N <= 14762:
 
 
     # Make heatmap plot
-    cycle_number = 135500
+    cycle_number = 421500
     count_offset = 6
-    variable = 'Z'
+    variable = 'W'
     plot_data = np.vstack((grid_x.flatten(), grid_y.flatten(), W_displacement.flatten()))
     #plot_data = heatmap_data(cycle_number, count_offset, df_separated, df_data[1], variable)
 
     point_size = 40
     colormap = 'rainbow'
-    color_label = 'Z [mm]'
+    color_label = 'W [mm]'
     count = N
     plot_title = f'{select_specimen[0][5:9]}, {cycle_number} cycles, count = {count}'
     filename = f'Heatmap/{variable}/{select_specimen[0][5:9]}_{cycle_number}_{count}.jpg'
-    heatmap_plot(plot_data, point_size, colormap, color_label, plot_title, filename, (-0.005, 0.005))
+    heatmap_plot(plot_data, point_size, colormap, color_label, plot_title, filename, (-20, 20))
 
     N += 2
