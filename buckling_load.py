@@ -33,7 +33,7 @@ fig.set_tight_layout(True)
 # Determine buckling load
 def determine_buckling_load(files, specimen, cycle_number, parameter, unit, threshold, points, df_data, df_separated):
 
-    print(cycle_number)
+    # print(cycle_number)
 
     # Find start and end of cycle
     #print('Finding start and end')
@@ -68,17 +68,37 @@ def determine_buckling_load(files, specimen, cycle_number, parameter, unit, thre
         interpolate_function = interpolate.interp1d(force_list, deltas_list)
         interpolated_deltas_list = interpolate_function(interpolated_force_list)
 
+        # ======================================================================
+        # TODO: Make this based on acceleration
+
+        second_deltas_list = []
+        for i in range(1, len(force_list)):
+
+            # print(interpolated_deltas_list[i], interpolated_deltas_list[i - 1], interpolated_deltas_list[i] - interpolated_deltas_list[i - 1])
+            parameter_second_delta = deltas_list[i] - deltas_list[i - 1]
+            absolute_parameter_second_delta = abs(parameter_second_delta)
+            second_deltas_list.append(absolute_parameter_second_delta)
+
+        # ax.plot(interpolated_force_list, interpolated_deltas_list, label = 'delta')
+        # ax.plot(force_list[1:], second_deltas_list, label = f'{point}', alpha = 0.5)
+
+        # Find the index of the maximum value in the second_deltas_list
+        buckling_idx = second_deltas_list.index(max(second_deltas_list))
+
+        # ======================================================================
+
         # Detect threshold intersection
         #print(f'Detecting threshold intersection for ({round(point[0], 1)}, {round(point[1], 1)})')
 
-        for i in range(len(interpolated_deltas_list)):
-            if interpolated_deltas_list[i] >= threshold:
-                buckling_forces[0].append(interpolated_force_list[i])
-                buckling_forces[1].append(interpolated_deltas_list[i])
-                break
+        # for i in range(len(interpolated_deltas_list)):
+        #     if interpolated_deltas_list[i] >= threshold:
+        #         buckling_forces[0].append(interpolated_force_list[i])
+        #         buckling_forces[1].append(interpolated_deltas_list[i])
+        #         break
+
 
         # Plot deltas
-        ax.plot(interpolated_force_list, interpolated_deltas_list, color = 'black', zorder = 2, alpha = 1)#, label = f'({round(point[0], 1)}, {round(point[1], 1)})')
+        # ax.plot(interpolated_force_list, interpolated_deltas_list, color = 'black', zorder = 2, alpha = 1)#, label = f'({round(point[0], 1)}, {round(point[1], 1)})')
 
     # Determine buckling force
     buckling_force = np.mean(buckling_forces[0])
@@ -86,26 +106,31 @@ def determine_buckling_load(files, specimen, cycle_number, parameter, unit, thre
     #print(f'F_buckle = {round(buckling_force, 1)} ± {round(2 * stdev, 1)} [kN]')
 
     # Plot things
-    ax.hlines(threshold, -100, 100, color = 'red', linewidth = 2, linestyle = 'dashed', label = f'Threshold = {threshold} [mm]', zorder = 3, alpha = 0.5)
-    ax.scatter(buckling_forces[0], buckling_forces[1], label = f'Threshold intersection', color = 'red', zorder = 4)
-    ax.vlines(buckling_force, -100, 100, linestyle = 'dashed', zorder = 3, linewidth = 2, color = 'blue', label = f'F_buckle = {round(buckling_force, 1)} [kN]')
-    ax.fill_betweenx((-100, 100), buckling_force - 2 * stdev, buckling_force - 1 * stdev, color = 'green', zorder = 1, alpha = 0.3, label = f'95% interval = ± {round(2 * stdev, 1)} [kN]')
-    ax.fill_betweenx((-100, 100), buckling_force + 1 * stdev, buckling_force + 2 * stdev, color = 'green', zorder = 1, alpha = 0.3)
-    ax.fill_betweenx((-100, 100), buckling_force - 1 * stdev, buckling_force + 1 * stdev, color = 'blue', zorder = 0, alpha = 0.3, label = f'68% interval = ± {round(1 * stdev, 1)} [kN]')
+    # ax.scatter(buckling_forces[0], buckling_forces[1], label = f'Buckling Point', color = 'black', zorder = 3)
+    # ax.hlines(threshold, -100, 100, color = 'red', linewidth = 2, linestyle = 'dashed', label = f'Threshold = {threshold} [mm]', zorder = 3, alpha = 0.5)
+    # ax.scatter(buckling_forces[0], buckling_forces[1], label = f'Threshold intersection', color = 'red', zorder = 4)
+    # ax.vlines(buckling_force, -100, 100, linestyle = 'dashed', zorder = 3, linewidth = 2, color = 'blue', label = f'F_buckle = {round(buckling_force, 1)} [kN]')
+    # ax.fill_betweenx((-100, 100), buckling_force - 2 * stdev, buckling_force - 1 * stdev, color = 'green', zorder = 1, alpha = 0.3, label = f'95% interval = ± {round(2 * stdev, 1)} [kN]')
+    # ax.fill_betweenx((-100, 100), buckling_force + 1 * stdev, buckling_force + 2 * stdev, color = 'green', zorder = 1, alpha = 0.3)
+    # ax.fill_betweenx((-100, 100), buckling_force - 1 * stdev, buckling_force + 1 * stdev, color = 'blue', zorder = 0, alpha = 0.3, label = f'68% interval = ± {round(1 * stdev, 1)} [kN]')
 
 
     # Setup figure
-    ax.invert_xaxis()
-    ax.set_xlabel(f'F [kN]')
-    ax.set_ylabel(f'Δ{parameter} [{unit}]')
-    ax.set_xlim(left = max(force_list) + 7, right = min(force_list) - 5)
-    ax.set_ylim(bottom = min(deltas_list) - 0.1, top = max(deltas_list) + 0.1)
-
-    plt.title(f'{select_specimen[0][5:9]} at {cycle_number} cycles')
-    plt.legend(loc="upper right")
-    plt.savefig('buckling_load.svg')
-    plt.show()
-    quit()
+    # ax.invert_xaxis()
+    # ax.set_xlabel(f'F [kN]')
+    # ax.set_ylabel(f'Δ{parameter} [{unit}]')
+    # ax.set_xlim(left = max(force_list) + 7, right = min(force_list) - 5)
+    # ax.set_ylim(bottom = min(deltas_list) - 0.1, top = max(deltas_list) + 0.1)
+    #
+    # plt.title(f'{select_specimen[0][5:9]} at {cycle_number} cycles')
+    # plt.legend(loc="upper right")
+    #
+    # ax.invert_xaxis()
+    # plt.xlabel('F [kN]')
+    # plt.ylabel("W'' [mm]")
+    # plt.legend()
+    # plt.savefig(f'BucklingLoad/Detection/BucklingDetection_{select_specimen[0][5:9]}_{cycle_number}.svg')
+    # ax.clear()
 
     result = [cycle_number, buckling_force, stdev]
 
@@ -125,7 +150,7 @@ unit = 'mm'
 threshold = 0.1
 
 # Input points to evaluate
-N_points = 20
+N_points = 8
 x_points = list(np.linspace(-70, 70, N_points))
 y_points = list(np.linspace(0, 0, N_points))
 points = [[x_points[i], y_points[i]] for i in range(0, len(x_points))]
@@ -145,10 +170,12 @@ upp_limit_1 = []
 low_limit_2 = []
 upp_limit_2 = []
 stdevs = []
-cycle_numbers = [500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500] #df_separated.cycle_number
+# cycle_numbers = [500, 5500, 10500, 15500, 20500]
+cycle_numbers = df_separated.cycle_number
 
 for cycle_number in cycle_numbers:
     buckling_result = determine_buckling_load(files, specimen, cycle_number, parameter, unit, threshold, points, df_data, df_separated)
+    print(buckling_result)
     buckling_loads.append(buckling_result[1])
     stdevs.append(buckling_result[2])
     low_limit_1.append(buckling_result[1] + buckling_result[2])
@@ -160,16 +187,16 @@ for cycle_number in cycle_numbers:
 df = pd.DataFrame({'cycle_number': cycle_numbers, 'buckling_load': buckling_loads, 'stdev': stdevs})
 df.to_csv(f'BucklingLoad/buckling_load_{specimen}_{parameter}_{threshold}.csv')
 
-# # Plot results
-# ax = plt.subplot()
-# ax.fill_between(cycle_numbers, low_limit_2, upp_limit_2, color = 'green', zorder = 1, alpha = 0.3, label = f'95% interval')
-# ax.fill_between(cycle_numbers, low_limit_1, upp_limit_1, color = 'blue', zorder = 0, alpha = 0.3, label = f'68% interval')
-# ax.plot(cycle_numbers, buckling_loads, label = 'F_buckle')
-# ax.invert_yaxis()
-#
-# plt.title(f'F_buckle of {specimen} (Δ{parameter} = {threshold} [{unit}])')
-# plt.xlabel('Cycles [-]')
-# plt.ylabel('F_buckle [kN]')
-# plt.legend()
-# plt.savefig(f'buckling_load_{specimen}.svg')
-# plt.show()
+# Plot results
+ax = plt.subplot()
+ax.fill_between(cycle_numbers, low_limit_2, upp_limit_2, color = 'green', zorder = 1, alpha = 0.3, label = f'95% interval')
+ax.fill_between(cycle_numbers, low_limit_1, upp_limit_1, color = 'blue', zorder = 0, alpha = 0.3, label = f'68% interval')
+ax.plot(cycle_numbers, buckling_loads, label = 'F_buckle')
+ax.invert_yaxis()
+
+plt.title(f'F_buckle of {specimen}')
+plt.xlabel('Cycles [-]')
+plt.ylabel('F_buckle [kN]')
+plt.legend()
+plt.savefig(f'buckling_load_{specimen}.svg')
+plt.show()
