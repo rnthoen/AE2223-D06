@@ -20,8 +20,8 @@ df_separated = separate_sequences(df_data[0])
 df_separated.to_csv(f'separated_sequences_{select_specimen[0][5:9]}.csv')
 
 # Make axial curve plot
-cycle_number_list_all = df_separated.cycle_number
-#cycle_number_list_all = [500, 1000, 1500, 2000]
+# cycle_number_list_all = df_separated.cycle_number
+cycle_number_list_all = [500, 1000, 1500, 2000]
 
 fig = plt.figure(figsize=(19.20,10.80))
 plt.style.use('fivethirtyeight')

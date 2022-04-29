@@ -32,13 +32,13 @@ ax.fill_between(df.cycle_number, low_limit_1, upp_limit_1, color = 'blue', zorde
 ax.fill_between(df.cycle_number, low_limit_1, low_limit_2, color = 'green', zorder = 1, alpha = 0.3, label = f'95% interval')
 ax.fill_between(df.cycle_number, upp_limit_1, upp_limit_2, color = 'green', zorder = 1, alpha = 0.3)
 
-ax.plot(df.cycle_number, df.buckling_load, label = f'F_buckle (Δ{parameter}, {threshold} {unit})', color = 'black', zorder = 2, linewidth = 3)
+ax.plot(df.cycle_number, df.buckling_load, label = f'F_buckle', color = 'black', zorder = 2, linewidth = 3)
 
 ax.set_xticks(np.arange(0, list(df.cycle_number)[-1], 10000))
 ax.invert_yaxis()
 ax.grid(True)
 
-plt.ylim(-4, -26)
+plt.ylim(24, -86)
 
 plt.title(f'{specimen}')
 plt.xlabel('N_cycles [-]')
