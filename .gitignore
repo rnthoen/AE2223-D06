@@ -147,6 +147,8 @@ cython_debug/
 # CSV files
 *.csv
 
+# SVG files
+*.svg
 # Raw images for animation
 Figures/
 Heatmap/

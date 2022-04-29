@@ -87,18 +87,21 @@ def determine_buckling_load(files, specimen, cycle_number, parameter, unit, thre
         #
         # # ======================================================================
 
-        # Detect threshold intersection
-        print(f'Detecting threshold intersection for ({round(point[0], 1)}, {round(point[1], 1)})')
 
+        # print(f'Detecting threshold intersection for ({round(point[0], 1)}, {round(point[1], 1)})')
+
+        # Detect threshold intersection
         for i in range(len(interpolated_deltas_list)):
             if interpolated_deltas_list[i] >= threshold:
-                buckling_forces[0].append(interpolated_force_list[i])
-                buckling_forces[1].append(interpolated_deltas_list[i])
+                if interpolated_force_list[i] > -30:
+                    buckling_forces[0].append(interpolated_force_list[i])
+                    buckling_forces[1].append(interpolated_deltas_list[i])
+                else:
+                    print(f'30 kN thingy happened for i = {i}')
                 break
 
-
         # Plot deltas
-        ax.plot(interpolated_force_list, interpolated_deltas_list, color = 'black', zorder = 2, alpha = 1)#, label = f'({round(point[0], 1)}, {round(point[1], 1)})')
+        ax.plot(interpolated_force_list, interpolated_deltas_list, zorder = 2, alpha = 1, label = f'({round(point[0], 1)}, {round(point[1], 1)})')
 
     # Determine buckling force
     buckling_force = np.mean(buckling_forces[0])
@@ -106,31 +109,26 @@ def determine_buckling_load(files, specimen, cycle_number, parameter, unit, thre
     #print(f'F_buckle = {round(buckling_force, 1)} ± {round(2 * stdev, 1)} [kN]')
 
     # Plot things
-    # ax.scatter(buckling_forces[0], buckling_forces[1], label = f'Buckling Point', color = 'black', zorder = 3)
-    # ax.hlines(threshold, -100, 100, color = 'red', linewidth = 2, linestyle = 'dashed', label = f'Threshold = {threshold} [mm]', zorder = 3, alpha = 0.5)
-    # ax.scatter(buckling_forces[0], buckling_forces[1], label = f'Threshold intersection', color = 'red', zorder = 4)
-    # ax.vlines(buckling_force, -100, 100, linestyle = 'dashed', zorder = 3, linewidth = 2, color = 'blue', label = f'F_buckle = {round(buckling_force, 1)} [kN]')
-    # ax.fill_betweenx((-100, 100), buckling_force - 2 * stdev, buckling_force - 1 * stdev, color = 'green', zorder = 1, alpha = 0.3, label = f'95% interval = ± {round(2 * stdev, 1)} [kN]')
-    # ax.fill_betweenx((-100, 100), buckling_force + 1 * stdev, buckling_force + 2 * stdev, color = 'green', zorder = 1, alpha = 0.3)
-    # ax.fill_betweenx((-100, 100), buckling_force - 1 * stdev, buckling_force + 1 * stdev, color = 'blue', zorder = 0, alpha = 0.3, label = f'68% interval = ± {round(1 * stdev, 1)} [kN]')
+    ax.scatter(buckling_forces[0], buckling_forces[1], label = f'Buckling Point', color = 'black', zorder = 3)
+    ax.hlines(threshold, -100, 100, color = 'red', linewidth = 2, linestyle = 'dashed', label = f'Threshold = {threshold} [mm]', zorder = 3, alpha = 0.5)
+    ax.scatter(buckling_forces[0], buckling_forces[1], label = f'Threshold intersection', color = 'red', zorder = 4)
+    ax.vlines(buckling_force, -100, 100, linestyle = 'dashed', zorder = 3, linewidth = 2, color = 'blue', label = f'F_buckle = {round(buckling_force, 1)} [kN]')
+    ax.fill_betweenx((-100, 100), buckling_force - 2 * stdev, buckling_force - 1 * stdev, color = 'green', zorder = 1, alpha = 0.3, label = f'95% interval = ± {round(2 * stdev, 1)} [kN]')
+    ax.fill_betweenx((-100, 100), buckling_force + 1 * stdev, buckling_force + 2 * stdev, color = 'green', zorder = 1, alpha = 0.3)
+    ax.fill_betweenx((-100, 100), buckling_force - 1 * stdev, buckling_force + 1 * stdev, color = 'blue', zorder = 0, alpha = 0.3, label = f'68% interval = ± {round(1 * stdev, 1)} [kN]')
 
 
     # Setup figure
-    # ax.invert_xaxis()
-    # ax.set_xlabel(f'F [kN]')
-    # ax.set_ylabel(f'Δ{parameter} [{unit}]')
-    # ax.set_xlim(left = max(force_list) + 7, right = min(force_list) - 5)
-    # ax.set_ylim(bottom = min(deltas_list) - 0.1, top = max(deltas_list) + 0.1)
-    #
-    # plt.title(f'{select_specimen[0][5:9]} at {cycle_number} cycles')
-    # plt.legend(loc="upper right")
-    #
-    # ax.invert_xaxis()
-    # plt.xlabel('F [kN]')
-    # plt.ylabel("W'' [mm]")
-    # plt.legend()
-    # plt.savefig(f'BucklingLoad/Detection/BucklingDetection_{select_specimen[0][5:9]}_{cycle_number}.svg')
-    # ax.clear()
+    ax.invert_xaxis()
+    ax.set_xlabel(f'F [kN]')
+    ax.set_ylabel(f'Δ{parameter} [{unit}]')
+    ax.set_xlim(left = max(force_list) + 7, right = min(force_list) - 5)
+    ax.set_ylim(bottom = min(deltas_list) - 0.1, top = max(deltas_list) + 0.1)
+
+    plt.title(f'{select_specimen[0][5:9]} at {cycle_number} cycles')
+    plt.legend(loc="upper right")
+    plt.savefig(f'BucklingLoad/Detection/BucklingDetection_{select_specimen[0][5:9]}_{cycle_number}.svg')
+    ax.clear()
 
     result = [cycle_number, buckling_force, stdev]
 
@@ -151,8 +149,10 @@ threshold = 0.1
 
 # Input points to evaluate
 N_points = 8
-x_points = list(np.linspace(-70, 70, N_points))
-y_points = list(np.linspace(0, 0, N_points))
+# x_points = list(np.linspace(-70, 70, N_points))
+# y_points = list(np.linspace(0, 0, N_points))
+x_points = [-70, -50, -30, 30, 50, 70]
+y_points = [0, 0, 0, 0, 0, 0]
 points = [[x_points[i], y_points[i]] for i in range(0, len(x_points))]
 
 # Generate look-up tables
