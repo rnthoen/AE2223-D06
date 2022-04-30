@@ -73,16 +73,14 @@ x_position_idx = df_data[1]['X'][df_data[1]['File_Number'] == i].index.tolist()
 y_position_idx = df_data[1]['Y'][df_data[1]['File_Number'] == i].index.tolist()
 
 for index in e_x_idx:
-    e_x_list.append(df_data[1]['Exx'][index])
-    e_y_list.append(df_data[1]['Eyy'][index])
-    x_position_list.append(df_data[1]['X'][index])
-    y_position_list.append(df_data[1]['Y'][index])
+    e_x_list.append(df_data[1]['Exx'].iloc[index])
+    e_y_list.append(df_data[1]['Eyy'].iloc[index])
+    x_position_list.append(df_data[1]['X'].iloc[index])
+    y_position_list.append(df_data[1]['Y'].iloc[index])
 
 e_x_list = np.array(e_x_list)
 e_y_list = np.array(e_y_list)
-print(x_position_list)
 x_position_list = np.array(x_position_list)
-print(x_position_list)
 y_position_list = np.array(y_position_list)
 
 ### Define u and v according to x-stress and y-stress ###
@@ -95,15 +93,9 @@ y = y_position_list
 
 fig = plt.figure(figsize=(12,8))
 fig.set_tight_layout(True)
-print(len(u))
-print(len(v))
-print(len(x))
-print(len(y))
-print(u)
-print(x)
 
 ### Define grid and plot ###
 # x,y = np.meshgrid(np.linspace(-80,80,total_count),np.linspace(-110,110,total_count))
-plt.quiver(x[:10],y[:10],u[:10],v[:10])
+plt.quiver(x,y,u,v)
 # plt.scatter(x_position_list,y_position_list)
 plt.show()
