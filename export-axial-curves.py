@@ -26,19 +26,19 @@ for i in range(5):
     # Make axial curve plot
     if i == 0:
         # cycle_number_list_all = [500,  50500, 100500, 150500]
-        cycle_number_list_all = [100500]
+        cycle_number_list_all = [120500]
     elif i == 1:
         # cycle_number_list_all = [500,  90500, 180500, 275500]
-        cycle_number_list_all = [100500]
+        cycle_number_list_all = [120500]
     elif i == 2:
         # cycle_number_list_all = [500,  50500, 100500, 140500]
-        cycle_number_list_all = [100500]
+        cycle_number_list_all = [120500]
     elif i == 3:
         # cycle_number_list_all = [500,  40500,  80500, 125500]
-        cycle_number_list_all = [100500]
+        cycle_number_list_all = [120500]
     elif i == 4:
         # cycle_number_list_all = [500, 130500, 260500, 400500]
-        cycle_number_list_all = [100500]
+        cycle_number_list_all = [120500]
 
     linestyles = ['dotted', 'dashed', 'dashdot', 'solid']
 
