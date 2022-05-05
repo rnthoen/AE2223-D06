@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Input specimen, cycles and parameter
-specimen = 'L103'
+specimen = 'L109'
 parameter = 'W'
 unit = 'mm'
 threshold = 0.1
