@@ -18,17 +18,17 @@ files = [['Data/L103/L1-03.csv', 'Data/L103/L1-03_0_2_4052.csv', 'Data/L103/L1-0
 
 ### Input space ###
 ## Select which specimen you want ##
-select_specimen = files[0]
+select_specimen = files[3]
 
 ## Select which cycle numbers you want to see ##
-cycle_number_list = [500,50500,100500,150500]
+cycle_number_list = [17000]
 
 ## Select position range of points to analyse strain for ##
 x_middles = list(np.linspace(-70, 70, 10))
 y_middles = list(np.linspace(0, 0, 10))
 
 ## Select which type of strain you want to analyse ##
-column = "W"
+column = "Exx"
 
 ### Imports MTS data and DIC data and sequences ###
 df_data = import_data(select_specimen)
@@ -52,8 +52,10 @@ def strain_load_curve_data(cycle_number_list, df_separated, df_data, X_position,
             column_position_list = []
 
             i = start_count
+            print(i)
             while i <= end_count:
                 if i%2 == 0:
+                    print(i)
                     Column_position = interpolate_panel(df_data[1],i,X_middle,Y_position[xs],column_type)
                     column_position_list.append(Column_position)
 
@@ -95,10 +97,10 @@ if len(cycle_number_list) == 1:
     fig, axs = plt.subplots(1, constrained_layout=True)
     for count, cycle in enumerate(cycle_number_list):
         for n in range(len(x_middles)):
-            # axs.plot(plot_data[n+count*len(x_middles)][1], plot_data[n+count*len(x_middles)][-1], label=f'{cycle} cycles at location (x={np.round(x_middles[n],2)},y={np.round(y_middles[n],2)})')
+            axs.plot(plot_data[n+count*len(x_middles)][1], plot_data[n+count*len(x_middles)][-1], label=f'{cycle} cycles at location (x={np.round(x_middles[n],2)},y={np.round(y_middles[n],2)})')
             new_load_list = plot_data[n+count*len(x_middles)][1].copy()
             new_load_list.pop(0)
-            axs.plot(new_load_list, w_difference[n+count*len(x_middles)][1], label=f'{cycle} cycles at location (x={np.round(x_middles[n], 2)},y={np.round(y_middles[n], 2)})')
+            #axs.plot(new_load_list, w_difference[n+count*len(x_middles)][1], label=f'{cycle} cycles at location (x={np.round(x_middles[n], 2)},y={np.round(y_middles[n], 2)})')
 
             # axs[count].set_title(f'{column} at x = {np.round(x_middles,2)}, y = {np.round(y_middles,2)} vs. Load')
             axs.legend(bbox_to_anchor=(1.04, 1), loc="upper left", prop={'size': 5})
@@ -112,10 +114,10 @@ else:
     fig, axs = plt.subplots(len(cycle_number_list),constrained_layout=True)
     for count, cycle in enumerate(cycle_number_list):
         for n in range(len(x_middles)):
-            #axs[count].plot(plot_data[n+count*len(x_middles)][1], plot_data[n+count*len(x_middles)][-1], label=f'{cycle} cycles at location (x={np.round(x_middles[n],2)},y={np.round(y_middles[n],2)})')
+            axs[count].plot(plot_data[n+count*len(x_middles)][1], plot_data[n+count*len(x_middles)][-1], label=f'{cycle} cycles at location (x={np.round(x_middles[n],2)},y={np.round(y_middles[n],2)})')
             new_load_list = plot_data[n+count*len(x_middles)][1].copy()
             new_load_list.pop(0)
-            axs[count].plot(new_load_list, w_difference[n+count*len(x_middles)][1], label=f'{cycle} cycles at location (x={np.round(x_middles[n],2)},y={np.round(y_middles[n],2)})')
+            #axs[count].plot(new_load_list, w_difference[n+count*len(x_middles)][1], label=f'{cycle} cycles at location (x={np.round(x_middles[n],2)},y={np.round(y_middles[n],2)})')
 
             #axs[count].set_title(f'{column} at x = {np.round(x_middles,2)}, y = {np.round(y_middles,2)} vs. Load')
             axs[count].hlines(0.1, min(plot_data[n + count * len(x_middles)][1]),

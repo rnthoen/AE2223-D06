@@ -18,23 +18,28 @@ files = [['Data/L103/L1-03.csv', 'Data/L103/L1-03_0_2_4052.csv', 'Data/L103/L1-0
 
 ### Input space ###
 ## Select which specimen you want ##
-select_specimen = files[0]
+select_specimen = files[3]
+if select_specimen == files[0]:
+    specimen = "L103"
+elif select_specimen == files[1]:
+    specimen = "L104"
+elif select_specimen == files[2]:
+    specimen = "L105"
+elif select_specimen == files[3]:
+    specimen = "L109"
+else: specimen = "L123"
 
 ## Select which cycle numbers you want to see ##
-cycle_number_list = [500]
+cycle_number_list = [17500]
 
 ### Imports MTS data and DIC data and sequences ###
 df_data = import_data(select_specimen)
-
+#df_data[1].to_csv(f'Data/Ben.csv')
 df_separated = separate_sequences(df_data[0])
 
 ### Define variables ###
-nu = 0.5
+nu = 0.33
 E = 1
-e_x_list = []
-e_y_list = []
-x_position_list = []
-y_position_list = []
 
 #print(df_data[1])
 
@@ -63,39 +68,55 @@ y_position_list = []
 
 idx = df_separated.cycle_number[df_separated.cycle_number == cycle_number_list[0]].index.tolist()
 start_count = int(df_separated.start_count[idx])
+if start_count%2 != 0:
+    start_count += 1
 end_count = int(df_separated.end_count[idx])
 total_count = end_count - start_count
 
 i = start_count
-e_x_idx = df_data[1]['Exx'][df_data[1]['File_Number'] == i].index.tolist()
-e_y_idx = df_data[1]['Eyy'][df_data[1]['File_Number'] == i].index.tolist()
-x_position_idx = df_data[1]['X'][df_data[1]['File_Number'] == i].index.tolist()
-y_position_idx = df_data[1]['Y'][df_data[1]['File_Number'] == i].index.tolist()
+while i <= end_count:
+    e_x_list = []
+    e_y_list = []
+    x_position_list = []
+    y_position_list = []
 
-for index in e_x_idx:
-    e_x_list.append(df_data[1]['Exx'].iloc[index])
-    e_y_list.append(df_data[1]['Eyy'].iloc[index])
-    x_position_list.append(df_data[1]['X'].iloc[index])
-    y_position_list.append(df_data[1]['Y'].iloc[index])
+    e_x_idx = df_data[1]['Exx'][df_data[1]['File_Number'] == i].index.tolist()
+    e_y_idx = df_data[1]['Eyy'][df_data[1]['File_Number'] == i].index.tolist()
+    x_position_idx = df_data[1]['X'][df_data[1]['File_Number'] == i].index.tolist()
+    y_position_idx = df_data[1]['Y'][df_data[1]['File_Number'] == i].index.tolist()
 
-e_x_list = np.array(e_x_list)
-e_y_list = np.array(e_y_list)
-x_position_list = np.array(x_position_list)
-y_position_list = np.array(y_position_list)
+    for index in e_x_idx:
+        e_x_list.append(df_data[1]['Exx'].iloc[index])
+        e_y_list.append(df_data[1]['Eyy'].iloc[index])
+        x_position_list.append(df_data[1]['X'].iloc[index])
+        y_position_list.append(df_data[1]['Y'].iloc[index])
 
-### Define u and v according to x-stress and y-stress ###
-x_stress = E/(1-nu**2)*(e_x_list+nu*e_y_list-2*nu**2*e_x_list)
-y_stress = E/(1-nu**2)*(e_y_list-nu*e_x_list)
-u = x_stress
-v = y_stress
-x = x_position_list
-y = y_position_list
+    e_x_list = np.array(e_x_list)
+    e_y_list = np.array(e_y_list)
+    x_position_list = np.array(x_position_list)
+    y_position_list = np.array(y_position_list)
 
-fig = plt.figure(figsize=(12,8))
-fig.set_tight_layout(True)
+    ### Define u and v according to x-stress and y-stress ###
+    x_stress = E/(1-nu**2)*(e_x_list+nu*e_y_list-2*nu**2*e_x_list)
+    y_stress = E/(1-nu**2)*(e_y_list-nu*e_x_list)
+    u = x_stress
+    v = y_stress
+    x = x_position_list
+    y = y_position_list
 
-### Define grid and plot ###
-# x,y = np.meshgrid(np.linspace(-80,80,total_count),np.linspace(-110,110,total_count))
-plt.quiver(x,y,u,v)
-# plt.scatter(x_position_list,y_position_list)
-plt.show()
+    fig = plt.figure(figsize=(12,8))
+    fig.set_tight_layout(True)
+
+    cycle = cycle_number_list[0]
+    load = np.round(df_data[0]['load'][df_data[0]['count'] == i].iloc[0],3)
+
+    ### Define grid and plot ###
+    # x,y = np.meshgrid(np.linspace(-80,80,total_count),np.linspace(-110,110,total_count))
+    plt.quiver(x,y,u,v)
+    fig.suptitle(f"Stress field of {specimen} at cycle number {cycle} and a load of {load} [kN]")
+    # plt.scatter(x_position_list,y_position_list)
+    #plt.show()
+    filename = f'Stress_field/{specimen}/{cycle}_{load}.jpg'
+    plt.savefig(filename)
+    print(f'Done with {filename}')
+    i += 2
