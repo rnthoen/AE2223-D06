@@ -53,6 +53,8 @@ def determine_buckling_load(files, specimen, cycle_number, parameter, unit, thre
         force_list = DIC_data[1]
         parameter_list = DIC_data[2]
 
+        # ax.plot(force_list, parameter_list, zorder = 2, alpha = 1, label = f'({round(point[0], 1)}, {round(point[1], 1)})') # For troubleshooting
+
         #print(f'Calculating deltas for ({round(point[0], 1)}, {round(point[1], 1)})')
         # Create parameter deltas list
         deltas_list = []
@@ -123,7 +125,7 @@ def determine_buckling_load(files, specimen, cycle_number, parameter, unit, thre
     ax.set_xlabel(f'F [kN]')
     ax.set_ylabel(f'Δ{parameter} [{unit}]')
     ax.set_xlim(left = max(force_list) + 7, right = min(force_list) - 5)
-    ax.set_ylim(bottom = min(deltas_list) - 0.1, top = max(deltas_list) + 0.1)
+    ax.set_ylim(bottom = min(deltas_list) - 0.1, top = max(deltas_list) + 0.1) # For troubleshooting
 
     plt.title(f'{select_specimen[0][5:9]} at {cycle_number} cycles')
     plt.legend(loc="upper right")
@@ -142,17 +144,17 @@ files = [['Data/L103/L1-03.csv', 'Data/L103/L1-03_0_2_4052.csv', 'Data/L103/L1-0
          ['Data/L123/L1-23.csv', 'Data/L123/L1-23_0_2_4000.csv', 'Data/L123/L1-23_4002_2_8080.csv', 'Data/L123/L1-23_8082_2_12430.csv', 'Data/L123/L1-23_12432_2_15850.csv', 'Data/L123/L1-23_15852_2_20506.csv', 'Data/L123/L1-23_20508_2_24236.csv', 'Data/L123/L1-23_24238_2_28894.csv', 'Data/L123/L1-23_28896_2_31384.csv', 'Data/L123/L1-23_31386_2_35416.csv', 'Data/L123/L1-23_35418_2_40390.csv', 'Data/L123/L1-23_40392_2_42256.csv']]
 
 # Input specimen, cycles and parameter
-specimen = 'L109'
+specimen = 'L123'
 parameter = 'W'
 unit = 'mm'
-threshold = 0.1
+threshold = 0.2
 
 # Input points to evaluate
 N_points = 8
 # x_points = list(np.linspace(-70, 70, N_points))
 # y_points = list(np.linspace(0, 0, N_points))
 x_points = [-70, -50, -30, 30, 50, 70]
-y_points = [0, 0, 0, 0, 0, 0]
+y_points = [70, 70, 70, 70, 70, 70]
 points = [[x_points[i], y_points[i]] for i in range(0, len(x_points))]
 
 # Generate look-up tables
@@ -170,10 +172,12 @@ upp_limit_1 = []
 low_limit_2 = []
 upp_limit_2 = []
 stdevs = []
-# cycle_numbers = [500, 5500, 10500, 15500, 20500]
+# cycle_numbers = [16000, 16500, 17000, 17500, 18000, 18500, 19000, 19500]
 cycle_numbers = df_separated.cycle_number
 
 for cycle_number in cycle_numbers:
+    # if cycle_number != 17000:
+        # try:
     buckling_result = determine_buckling_load(files, specimen, cycle_number, parameter, unit, threshold, points, df_data, df_separated)
     print(buckling_result)
     buckling_loads.append(buckling_result[1])
@@ -182,6 +186,9 @@ for cycle_number in cycle_numbers:
     upp_limit_1.append(buckling_result[1] - buckling_result[2])
     low_limit_2.append(buckling_result[1] + 2 * buckling_result[2])
     upp_limit_2.append(buckling_result[1] - 2 * buckling_result[2])
+        # except:
+            # print(f'Error at {cycle_number} cycles')
+
 
 # Save results
 df = pd.DataFrame({'cycle_number': cycle_numbers, 'buckling_load': buckling_loads, 'stdev': stdevs})
