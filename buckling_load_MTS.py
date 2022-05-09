@@ -7,6 +7,7 @@ Create a folder called 'MTS_buckling' for the images
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from scipy import interpolate
 
 # Import functions
 from import_data import import_data
@@ -46,7 +47,7 @@ if do_print:
 df_separated = separate_sequences(df_data[0])
 
 # Select sequence
-# cycle_number_list = [500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500]
+# cycle_number_list = [3000]
 cycle_number_list = df_separated.cycle_number.to_list()
 
 # Loop through all cycles
@@ -87,7 +88,7 @@ for cycle_number in cycle_number_list:
     # Determine buckling point based on first model
     if do_print:
         print('Determining buckling point for first model')
-    threshold = 1.2                                             # We set a margin of 1.2
+                                               # We set a margin of 1 kN here
     avg_range = 3                                               #  We take the initial delta as the average of the first 3 data points
     y_start = np.ones(len(x)) * np.average(y_delta_model[0:avg_range])
     # y_threshold = y_start * threshold
@@ -149,19 +150,31 @@ for cycle_number in cycle_number_list:
         print('Determining buckling point for least-squares approximation')
     y_start = np.ones(len(x)) * np.average(y_delta_lstsq[0:i])
     # y_threshold = y_start * threshold
-    y_threshold = y_start + 0.5
+    y_threshold = y_start + 0.5                                         # Here, margin of 0.5 kN
+
+    # Interpolation
+    N_interp = len(x) * 10
+    interpolate_function_lstsq = interpolate.interp1d(x, y)
+    interpolate_deltas_function_lstsq = interpolate.interp1d(x, y_delta_lstsq)
+
+    x_interp_lstsq = np.linspace(max(x), min(x), N_interp)
+    y_interp_lstsq = interpolate_function_lstsq(x_interp_lstsq)
+    y_delta_interp_lstsq = interpolate_deltas_function_lstsq(x_interp_lstsq)
+
     j = i - 1
-    while (y_delta_lstsq[j] < y_threshold[j]):
+    while (y_delta_interp_lstsq[j] < y_threshold[0]):
         j += 1
-    x_buckling_lstsq = x[j]
-    y_buckling_lstsq = y[j]
-    y_delta_buckling_lstsq = y_delta_lstsq[j]
+
+    x_buckling_lstsq = x_interp_lstsq[j]
+    y_buckling_lstsq = y_interp_lstsq[j]
+    y_delta_buckling_lstsq = y_delta_interp_lstsq[j]
     buckling_force = y_buckling_lstsq
 
     # Plot least-squares approximation
     if make_plots:
         ax4 = plt.subplot(3, 2, 4)
-        ax4.plot(x, y_delta_lstsq, label = 'Delta between Fitted model and MTS data', color = 'black')
+        # ax4.plot(x, y_delta_lstsq, label = 'Delta between Fitted model and MTS data', color = 'black')
+        ax4.plot(x_interp_lstsq, y_delta_interp_lstsq, label = 'Interpolated delta between Fitted model and MTS data', color = 'black')
         ax4.plot(x, y_threshold, label = 'Threshold delta', color = 'black', linestyle = 'dashed')
         ax4.scatter(x_buckling_lstsq, y_delta_buckling_lstsq, label = f'Estimated buckling (at {round(buckling_force, 2)} kN)', color = 'red')
         ax4.set_xlabel('d [mm]')
