@@ -46,7 +46,7 @@ if do_print:
 df_separated = separate_sequences(df_data[0])
 
 # Select sequence
-# cycle_number_list = [500, 1000, 1500, 2000]
+# cycle_number_list = [500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500]
 cycle_number_list = df_separated.cycle_number.to_list()
 
 # Loop through all cycles
@@ -67,9 +67,9 @@ for cycle_number in cycle_number_list:
 
     # Plot MTS data
     if make_plots:
-        fig = plt.figure(figsize=(10, 6))
+        fig = plt.figure(figsize=(10, 10))
         fig.set_tight_layout(True)
-        ax = plt.subplot(2, 2, 1)
+        ax = plt.subplot(3, 2, 1)
         ax.plot(x, y, label = 'MTS data', color = 'black')
         ax.plot(x_model, y_model, label = f'Initial model (E = {E} kN/mm)', color = 'black', linestyle = 'dashed')
         ax.set_xlabel('d [mm]')
@@ -90,7 +90,8 @@ for cycle_number in cycle_number_list:
     threshold = 1.2                                             # We set a margin of 1.2
     avg_range = 3                                               #  We take the initial delta as the average of the first 3 data points
     y_start = np.ones(len(x)) * np.average(y_delta_model[0:avg_range])
-    y_threshold = y_start * threshold
+    # y_threshold = y_start * threshold
+    y_threshold = y_start + 1
     i = avg_range + 1
     while (y_delta_model[i] < y_threshold[i]):
         i += 1
@@ -100,7 +101,7 @@ for cycle_number in cycle_number_list:
 
     # Plot initial model estimation
     if make_plots:
-        ax2 = plt.subplot(2, 2, 2)
+        ax2 = plt.subplot(3, 2, 2)
         ax2.plot(x, y_delta_model, label = 'Delta between Initial model and MTS data', color = 'black')
         ax2.plot(x, y_threshold, label = 'Threshold delta', color = 'black', linestyle = 'dashed')
         ax2.scatter(x_buckling, y_delta_buckling, label = f'Estimated buckling (at {round(y_buckling, 2)} kN)', color = 'red')
@@ -128,7 +129,7 @@ for cycle_number in cycle_number_list:
 
     # Plot least-squares approximation
     if make_plots:
-        ax3 = plt.subplot(2, 2, 3)
+        ax3 = plt.subplot(3, 2, 3)
         ax3.plot(x, y, label = 'MTS data', color = 'black')
         ax3.plot(x_lstsq, y_lstsq, label = 'Fitted model', color = 'black', linestyle = 'dashed')
         ax3.set_xlabel('d [mm]')
@@ -147,7 +148,8 @@ for cycle_number in cycle_number_list:
     if do_print:
         print('Determining buckling point for least-squares approximation')
     y_start = np.ones(len(x)) * np.average(y_delta_lstsq[0:i])
-    y_threshold = y_start * threshold
+    # y_threshold = y_start * threshold
+    y_threshold = y_start + 0.5
     j = i - 1
     while (y_delta_lstsq[j] < y_threshold[j]):
         j += 1
@@ -158,7 +160,7 @@ for cycle_number in cycle_number_list:
 
     # Plot least-squares approximation
     if make_plots:
-        ax4 = plt.subplot(2, 2, 4)
+        ax4 = plt.subplot(3, 2, 4)
         ax4.plot(x, y_delta_lstsq, label = 'Delta between Fitted model and MTS data', color = 'black')
         ax4.plot(x, y_threshold, label = 'Threshold delta', color = 'black', linestyle = 'dashed')
         ax4.scatter(x_buckling_lstsq, y_delta_buckling_lstsq, label = f'Estimated buckling (at {round(buckling_force, 2)} kN)', color = 'red')
@@ -166,6 +168,19 @@ for cycle_number in cycle_number_list:
         ax4.set_ylabel('ΔF [kN]')
         ax4.invert_xaxis()
         ax4.set_title('Step #4: Again, look where the delta begins to deviate')
+        plt.legend()
+
+    # Plot solution
+    if make_plots:
+        ax5 = plt.subplot(3, 2, 5)
+        ax5.plot(x, y, label = 'MTS data', color = 'black')
+        ax5.plot(x_lstsq, y_lstsq, label = 'Fitted model', color = 'black', linestyle = 'dashed')
+        ax5.scatter(x_buckling_lstsq, y_buckling_lstsq, label = f'Estimated buckling (at {round(buckling_force, 2)} kN)', color = 'red')
+        ax5.set_xlabel('d [mm]')
+        ax5.set_ylabel('F [kN]')
+        ax5.invert_xaxis()
+        ax5.invert_yaxis()
+        ax5.set_title('Step #5: Look up buckling force')
         plt.legend()
 
     if make_plots:
