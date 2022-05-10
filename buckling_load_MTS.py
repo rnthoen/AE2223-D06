@@ -25,6 +25,7 @@ do_print = False
 
 # Create results lists
 buckling_loads = []
+buckling_loads_new = []
 stdevs = []
 
 # Specify location of dataset
@@ -47,7 +48,7 @@ if do_print:
 df_separated = separate_sequences(df_data[0])
 
 # Select sequence
-# cycle_number_list = [3000]
+# cycle_number_list = [500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500]
 cycle_number_list = df_separated.cycle_number.to_list()
 
 # Loop through all cycles
@@ -165,10 +166,19 @@ for cycle_number in cycle_number_list:
     while (y_delta_interp_lstsq[j] < y_threshold[0]):
         j += 1
 
+    k = j
+    while (y_delta_interp_lstsq[k] > y_delta_interp_lstsq[k - 1]):
+        k -= 1
+
     x_buckling_lstsq = x_interp_lstsq[j]
     y_buckling_lstsq = y_interp_lstsq[j]
     y_delta_buckling_lstsq = y_delta_interp_lstsq[j]
     buckling_force = y_buckling_lstsq
+
+    x_start_increase = x_interp_lstsq[k]
+    y_start_increase = y_interp_lstsq[k]
+    y_delta_start_increase = y_delta_interp_lstsq[k]
+    buckling_force_start_increase = y_start_increase
 
     # Plot least-squares approximation
     if make_plots:
@@ -177,6 +187,7 @@ for cycle_number in cycle_number_list:
         ax4.plot(x_interp_lstsq, y_delta_interp_lstsq, label = 'Interpolated delta between Fitted model and MTS data', color = 'black')
         ax4.plot(x, y_threshold, label = 'Threshold delta', color = 'black', linestyle = 'dashed')
         ax4.scatter(x_buckling_lstsq, y_delta_buckling_lstsq, label = f'Estimated buckling (at {round(buckling_force, 2)} kN)', color = 'red')
+        ax4.scatter(x_start_increase, y_delta_start_increase, label = f'NEW! Estimated buckling (at {round(buckling_force_start_increase, 2)} kN)', color = 'blue')
         ax4.set_xlabel('d [mm]')
         ax4.set_ylabel('ΔF [kN]')
         ax4.invert_xaxis()
@@ -189,6 +200,7 @@ for cycle_number in cycle_number_list:
         ax5.plot(x, y, label = 'MTS data', color = 'black')
         ax5.plot(x_lstsq, y_lstsq, label = 'Fitted model', color = 'black', linestyle = 'dashed')
         ax5.scatter(x_buckling_lstsq, y_buckling_lstsq, label = f'Estimated buckling (at {round(buckling_force, 2)} kN)', color = 'red')
+        ax5.scatter(x_start_increase, y_start_increase, label = f'NEW! Estimated buckling (at {round(buckling_force_start_increase, 2)} kN)', color = 'blue')
         ax5.set_xlabel('d [mm]')
         ax5.set_ylabel('F [kN]')
         ax5.invert_xaxis()
@@ -202,11 +214,12 @@ for cycle_number in cycle_number_list:
             plt.show()
 
     buckling_loads.append(buckling_force)
-    stdevs.append(2)    # TODO: Different margin
+    buckling_loads_new.append(buckling_force_start_increase)
+    stdevs.append(0)    # TODO: Different margin
     print(f'\rCycle {cycle_number}/{cycle_number_list[-1]} ({int(100 * cycle_number / cycle_number_list[-1])}%)', end='')
 
 # Save results
-df = pd.DataFrame({'cycle_number': cycle_number_list, 'buckling_load': buckling_loads, 'stdev': stdevs})
+df = pd.DataFrame({'cycle_number': cycle_number_list, 'buckling_load': buckling_loads, 'buckling_load_new': buckling_loads_new, 'stdev': stdevs})
 df.to_csv(f'MTS_buckling/{specimen}_MTS_buckling.csv')
 
 print(f'\nDone!')
