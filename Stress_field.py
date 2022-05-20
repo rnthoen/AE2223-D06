@@ -18,7 +18,7 @@ files = [['Data/L103/L1-03.csv', 'Data/L103/L1-03_0_2_4052.csv', 'Data/L103/L1-0
 
 ### Input space ###
 ### Select which specimen you want ###
-select_specimen = files[4]
+select_specimen = files[0]
 
 if select_specimen == files[0]:
     specimen = "L103"
@@ -31,7 +31,7 @@ elif select_specimen == files[3]:
 else: specimen = "L123"
 
 ### Select which cycle number you want to see ###
-cycle_number_list = [420500]
+cycle_number_list = [500]
 
 ### Imports MTS data and DIC data and sequences ###
 df_data = import_data(select_specimen)
@@ -49,18 +49,22 @@ if start_count%2 != 0:
 end_count = int(df_separated.end_count[idx])
 total_count = end_count - start_count
 
-i = start_count+8
+i = start_count
 # while i <= end_count:
 ### Indent everything after this to create and save stress fields for all loads in one cycle ###
 e_x_list = []
 e_y_list = []
 x_position_list = []
 y_position_list = []
+e_x_start_list = []
+e_y_start_list = []
 
 e_x_idx = df_data[1]['Exx'][df_data[1]['File_Number'] == i].index.tolist()
 e_y_idx = df_data[1]['Eyy'][df_data[1]['File_Number'] == i].index.tolist()
 x_position_idx = df_data[1]['X'][df_data[1]['File_Number'] == i].index.tolist()
 y_position_idx = df_data[1]['Y'][df_data[1]['File_Number'] == i].index.tolist()
+e_x_start_idx = df_data[1]['Exx'][df_data[1]['File_Number'] == start_count].index.tolist()
+e_y_start_idx = df_data[1]['Eyy'][df_data[1]['File_Number'] == start_count].index.tolist()
 
 for index in e_x_idx:
     e_x_list.append(df_data[1]['Exx'].iloc[index])
@@ -68,19 +72,30 @@ for index in e_x_idx:
     x_position_list.append(df_data[1]['X'].iloc[index])
     y_position_list.append(df_data[1]['Y'].iloc[index])
 
+for index in e_x_start_idx:
+    e_x_start_list.append(df_data[1]['Exx'].iloc[index])
+    e_y_start_list.append(df_data[1]['Eyy'].iloc[index])
+
 e_x_list = np.array(e_x_list)
 e_y_list = np.array(e_y_list)
 x_position_list = np.array(x_position_list)
 y_position_list = np.array(y_position_list)
+e_x_start_list = np.array(e_x_start_list)
+e_y_start_list = np.array(e_y_start_list)
 
 ### Trial with actual poisson ratio ###
 ### Gave really weird stress fields, which changed direction almost randomly for different loads ###
-poisson = np.average(-1*(e_x_list/e_y_list))
+poisson = np.average(-1*(e_x_start_list/e_y_start_list))
+print(poisson)
 
 ### Define u and v according to x-stress and y-stress ###
 ### Change 'nu' to 'poisson' when wanting to use a non-constant poisson ratio ###
-x_stress = (E/(1-nu**2))*(e_x_list+nu*e_y_list-2*nu**2*e_x_list)
-y_stress = (E/(1-nu**2))*(e_y_list-nu*e_x_list)
+# x_stress = (E/(1-nu**2))*(e_x_list+nu*e_y_list-2*nu**2*e_x_list)
+# y_stress = (E/(1-nu**2))*(e_y_list-nu*e_x_list)
+
+### Revised stress calculation which might also be correct ###
+x_stress = (E/(1-poisson**2))*(e_x_list + poisson*e_y_list)
+y_stress = (E/(1-poisson**2))*(e_y_list + poisson*e_x_list)
 
 u = x_stress
 v = y_stress
@@ -97,8 +112,8 @@ load = np.round(df_data[0]['load'][df_data[0]['count'] == i].iloc[0],3)
 # plt.quiver(x,y,u,v)
 # fig.suptitle(f"Stress field of {specimen} at cycle number {cycle} and a load of {load} [kN]")
 # filename = f'Stress_field/{specimen}/{cycle}_{load}.jpg'
-# plt.savefig(filename) #Uncomment for saving file at filename location
-# #plt.show()
+# # plt.savefig(filename) #Uncomment for saving file at filename location
+# plt.show()
 # print(f'Done with {filename}')
 
 ### Plot with outliers around clamp excluded ###
@@ -132,13 +147,16 @@ elif specimen == 'L123':
     CSV_dataframe[(CSV_dataframe['x'] >= 52) & (CSV_dataframe['x'] <= 75) & (CSV_dataframe['y'] >= -110) & (CSV_dataframe['y'] <= -81)] = 0
     CSV_dataframe[(CSV_dataframe['x'] >= -81) & (CSV_dataframe['x'] <= -77) & (CSV_dataframe['y'] <= 90) & (CSV_dataframe['y'] >= -81)] = 0
 
-CSV_dataframe.to_csv(f'Stress_field/CSV_files/{specimen}_{cycle}_{load}.csv')
+#CSV_dataframe.to_csv(f'Stress_field/CSV_files/{specimen}_{cycle}_{load}.csv')
 
 plt.quiver(CSV_dataframe['x'],CSV_dataframe['y'],CSV_dataframe['u'],CSV_dataframe['v'])
 fig.suptitle(f"Stress field of {specimen} at cycle number {cycle} and a load of {load} [kN]")
 filename = f'Stress_field/{specimen}/{cycle}_{load}.jpg'
 #plt.savefig(filename) #Uncomment for saving file at filename location
-plt.show()
+#plt.show()
+# print(f'Exx equals {e_x_list[345]}')
+# print(f'Eyy equals {e_y_list[345]}')
+# print(f'At ({CSV_dataframe["x"].iloc[345]},{CSV_dataframe["y"].iloc[345]}), v equals {CSV_dataframe["v"].iloc[345]}')
 print(f'Done with {filename}')
 
 # i += 2 #Uncomment when using while loop
