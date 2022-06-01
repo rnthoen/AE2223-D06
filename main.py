@@ -1,12 +1,9 @@
 import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
 
 from import_data import import_data
 from separate_sequences import separate_sequences
-from axial_curve_data import axial_curve_data
-from min_max_displacement import min_max_displacement
 from poisson import poisson
+from poisson import poisson_avg
 from heatmap_data import heatmap_data
 from heatmap_plot import heatmap_plot
 from stiffness_coefficient import stiffness
@@ -26,41 +23,43 @@ df_separated.to_csv(f'separated_sequences_{select_specimen[0][5:9]}.csv')
 #Make  stiffness coeficient plots
 #buckle = np.ones(len(df_separated[0]))*(-20)
 buckle = np.linspace(-25, -15, len(df_separated))
-k1,k2 = stiffness(buckle,df_separated, df_data[0])
-# poisson data
+k1, k2 = stiffness(buckle, df_separated, df_data[0])
 
-path = "left panel/pre-buckling"
-cycle_numbers = np.arange(500, 152000, 500)
+
+# poisson heat maps
+path = "L103"                           # select folder to put figures in
+
+mid_cycle = round(len(df_separated.cycle_number) / 2)
+end_cycle = len(df_separated.cycle_number)-1
+cycle_numbers = [df_separated.cycle_number[0], df_separated.cycle_number[mid_cycle], df_separated.cycle_number[end_cycle]]
+
+start_counts = []
+end_counts = []
+
 for cycle_number in cycle_numbers:
     start_count = df_separated["start_count"].loc[df_separated["cycle_number"] == cycle_number].iloc[0]
     end_count = df_separated["end_count"].loc[df_separated["cycle_number"] == cycle_number].iloc[0]
+    # obtain even number count
     if start_count % 2 != 0:
         start_count += 1
-    elif end_count % 2 != 0:
+    if end_count % 2 != 0:
         end_count -= 1
+    start_counts.append(start_count)        # obtain starting count for given cycle number
+    end_counts.append(end_count)            # obtain ending count for given cycle number
 
-    poisson(df_data, start_count, select_specimen[0][5:9], cycle_number, path)
+while 0 != min(np.array(end_counts) - np.array(start_counts)):
+    # loop from start count to end count to obtain heat maps at each count number
+    poisson(df_data, start_counts, select_specimen[0][5:9], cycle_numbers, path)
+    start_counts = start_counts + np.array([2, 2, 2])       # increment count number
 
+# Calculate average poisson values for skin and stiffener
+count = 8122              # Count value at which to take the average -- L103: 8122    L104: 42    L105: 7698   L123: 40
+x_bounds = [[-70, -40],   # upper and lower bound x-value for skin/stiffener
+            [-20, 20]]
+y_bounds = [[-10, 10],    # upper and lower bound y-value for skin/stiffener
+            [50, 60]]
+print(poisson_avg(df_data, count, x_bounds, y_bounds))  # returns 2 poisson averages, for skin and stiffener area
 
-
-#Make min/max displacement, correlation plots
-#min_max_displacement(df_separated, df_data[0])
-
-# Make axial curve plot
-# cycle_number_list = [500, 30500, 60500, 90500, 120500]
-# plot_data = axial_curve_data(cycle_number_list, df_separated, df_data[0])
-#
-# for j in range(len(cycle_number_list)):
-#     ax = plt.subplot()
-#     ax.plot(plot_data[j][2], plot_data[j][1], label = f'{cycle_number_list[j]} cycles')
-#     ax.invert_xaxis()
-#     ax.invert_yaxis()
-#
-# plt.xlabel('Displacement [mm]')
-# plt.ylabel('Load [kN]')
-# plt.title(f'Load-displacement of {select_specimen[0][5:9]}')
-# plt.legend()
-# plt.show()
 
 # Make heatmap plot
 cycle_number = 500
