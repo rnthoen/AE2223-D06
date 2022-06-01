@@ -1,6 +1,4 @@
-import pandas as pd
 import matplotlib.pyplot as plt
-from heatmap_data import heatmap_data
 
 def heatmap_plot(plot_data, point_size, colormap, color_label, plot_title, filename, range):
     var1 = plot_data[0]
@@ -16,7 +14,8 @@ def heatmap_plot(plot_data, point_size, colormap, color_label, plot_title, filen
     plt.xlabel('x [mm]')
     plt.ylabel('y [mm]')
     plt.title(plot_title)
-
+    plt.axvline(x=-32.5, color='k', linestyle='--')
+    plt.axvline(x=32.5, color='k', linestyle='--')
     plt.savefig(filename)
 
-    #plt.show()
+    # plt.show()

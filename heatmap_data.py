@@ -13,7 +13,6 @@ def heatmap_data(cycle_number, count_offset, df_separated, df_data, variable):
         selected_count += 1
         print('count is not even, added 1 to print the next frame')
     if selected_count <= end_count:
-        print(selected_count)
 
         # find x and y for each point from start to end (both incl.)
         x_list = []
